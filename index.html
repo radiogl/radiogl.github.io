@@ -1,0 +1,2034 @@
+<!doctype html>
+<html lang="ca" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Ràdio GL</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    html, body { height: 100%; margin: 0; }
+    * { font-family: 'Outfit', sans-serif; }
+    .mono { font-family: 'Space Mono', monospace; }
+    .app-shell { height: 100%; width: 100%; overflow: hidden; display: flex; flex-direction: column; }
+    .page { display: none; flex-direction: column; flex: 1; overflow-y: auto; }
+    .page.active { display: flex; }
+    .card-prog { transition: transform 0.2s, box-shadow 0.2s; }
+    .card-prog:active { transform: scale(0.97); }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+    .anim-in { animation: fadeUp 0.4s ease-out both; }
+    .anim-d1 { animation-delay: 0.05s; }
+    .anim-d2 { animation-delay: 0.1s; }
+    .anim-d3 { animation-delay: 0.15s; }
+    .anim-d4 { animation-delay: 0.2s; }
+    .anim-d5 { animation-delay: 0.25s; }
+    .wave-bg {
+      background: radial-gradient(ellipse at 30% 0%, #ff6b3520 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 100%, #f43f5e15 0%, transparent 50%);
+    }
+    .bottom-nav-item { transition: color 0.2s; }
+    .bottom-nav-item.active-nav { color: #ff6b35; }
+    .bottom-nav-item.active-nav .nav-dot { opacity: 1; }
+    .nav-dot { opacity: 0; transition: opacity 0.2s; }
+
+    @keyframes popIn { from { opacity:0; transform:scale(0.7) translateY(20px); } to { opacity:1; transform:scale(1) translateY(0); } }
+    #kids-popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 24px; }
+    #kids-popup-overlay.show { display: flex; }
+    #kids-popup-box { border-radius: 28px; padding: 32px 24px; max-width: 320px; width: 100%; text-align: center; animation: popIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both; }
+    #kids-popup-emoji { font-size: 3.5rem; line-height: 1; margin-bottom: 12px; }
+    #kids-popup-title { font-size: 1.6rem; font-weight: 900; margin-bottom: 8px; }
+    #kids-popup-msg { font-size: 0.95rem; font-weight: 600; opacity: 0.85; margin-bottom: 24px; line-height: 1.5; }
+    #kids-popup-btn { font-weight: 900; font-size: 1rem; border: none; border-radius: 14px; padding: 14px 36px; cursor: pointer; transition: transform 0.15s; }
+    #kids-popup-btn:active { transform: scale(0.93); }
+    .section-hero { position: relative; overflow: hidden; }
+    @supports (padding-bottom: env(safe-area-inset-bottom)) {
+      nav { padding-bottom: calc(0.25rem + env(safe-area-inset-bottom)) !important; }
+    }
+    .section-hero::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 60%;
+      background: linear-gradient(to top, #111111, transparent);
+    }
+    .section-hero-content { position: relative; z-index: 2; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .joke-spinner { animation: spin 1s linear infinite; display: inline-block; }
+  </style>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ff6b35">
+ </head>
+ <body class="h-full bg-[#111111] text-white">
+  <!-- KIDS POPUP -->
+  <div id="kids-popup-overlay">
+    <div id="kids-popup-box">
+      <div id="kids-popup-emoji">🎉</div>
+      <div id="kids-popup-title">Títol</div>
+      <div id="kids-popup-msg">Missatge</div>
+      <button id="kids-popup-btn" onclick="kidsPopupClose()">OK!</button>
+    </div>
+  </div>
+  <div class="app-shell" id="app">
+    <!-- SUBSCRIPTION OFFERS POPUP -->
+    <div id="subs-overlay" class="fixed inset-0 z-[99999] bg-black/70 backdrop-blur-sm flex items-center justify-center p-6" style="display:none;">
+      <div class="w-full max-w-sm bg-[#161616] border border-violet-500/30 rounded-2xl overflow-hidden shadow-2xl max-h-[85vh] flex flex-col">
+        <div class="h-1 bg-gradient-to-r from-violet-500 to-violet-700 shrink-0"></div>
+        <div class="p-6 overflow-y-auto">
+          <div class="flex items-center gap-2 mb-3">
+            <i data-lucide="crown" class="w-5 h-5 text-violet-400"></i>
+            <span class="text-xs font-700 uppercase tracking-widest text-violet-400">RGL Plus · Subscripcions</span>
+          </div>
+          <p class="text-sm opacity-80 leading-relaxed mb-4">Tria una oferta i envia un correu a <a href="mailto:radiogl.coll@gmail.com" class="text-violet-400 font-700">radiogl.coll@gmail.com</a> amb l'oferta que has triat i t'indicarem les instruccions per obtenir l'abonament.</p>
+          <div class="space-y-2">
+            <div class="faq-item bg-white/5 rounded-xl border border-white/5 overflow-hidden">
+              <button onclick="toggleFaq(this)" class="w-full flex items-center gap-3 p-4 text-left">
+                <span class="flex-1 font-700 text-sm">Abonament mensual</span>
+                <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-gray-500 shrink-0 transition-transform"></i>
+              </button>
+              <div class="faq-answer hidden px-4 pb-4"><p class="text-sm opacity-80 leading-relaxed">0,99€/mes</p></div>
+            </div>
+            <div class="faq-item bg-white/5 rounded-xl border border-white/5 overflow-hidden">
+              <button onclick="toggleFaq(this)" class="w-full flex items-center gap-3 p-4 text-left">
+                <span class="flex-1 font-700 text-sm">Abonament anual</span>
+                <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-gray-500 shrink-0 transition-transform"></i>
+              </button>
+              <div class="faq-answer hidden px-4 pb-4"><p class="text-sm opacity-80 leading-relaxed">9,99€/mes</p></div>
+            </div>
+            <div class="faq-item bg-white/5 rounded-xl border border-white/5 overflow-hidden">
+              <button onclick="toggleFaq(this)" class="w-full flex items-center gap-3 p-4 text-left">
+                <span class="flex-1 font-700 text-sm">Abonament gratuït</span>
+                <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-gray-500 shrink-0 transition-transform"></i>
+              </button>
+              <div class="faq-answer hidden px-4 pb-4"><p class="text-sm opacity-80 leading-relaxed">Al nostre grup de WhatsApp regalem abonaments si fas certes coses a la nostra ràdio, com per exemple: si tens 1 entrevista, has demanat 3 cançons i ens has enviat un correu, tens un mes gratuït (aquesta oferta és falsa, només és d'exemple). Totes les persones que ho facin hauran d'enviar un mail dient que ho han fet i el nostre equip ho verificarà; si és afirmatiu, via mail, t'enviarem les instruccions.</p></div>
+            </div>
+          </div>
+          <button onclick="document.getElementById('subs-overlay').style.display='none'" class="w-full mt-5 bg-violet-600 hover:bg-violet-500 active:scale-95 transition rounded-xl py-3 font-700 text-sm">Tancar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOME PAGE -->
+    <div class="page active" id="page-home">
+      <div class="flex-1 overflow-y-auto wave-bg">
+        <!-- Hero compacte -->
+        <div class="px-5 pt-5 pb-2 flex items-start justify-between">
+          <div>
+            <h1 class="text-3xl font-900 leading-tight tracking-tight" id="app-title">Ràdio<br><span class="text-[#ff6b35]">GL</span></h1>
+            <p class="mt-1 text-sm text-gray-400 leading-relaxed" id="slogan-text">Estrena el teu dia amb la Ràdio GL</p>
+          </div>
+          <!-- EN DIRECTE button -->
+          <a href="http://radioglendirecte.edgeone.dev" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 bg-white/10 border border-white/10 rounded-full px-3 py-1.5 active:scale-95 transition mt-1">
+            <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse shrink-0"></span>
+            <span class="text-[11px] font-700">EN DIRECTE</span>
+          </a>
+        </div>
+        <!-- Equalizer petit -->
+        <div class="flex items-end gap-1 px-5 pb-3 h-7">
+          <div class="w-1 rounded-full bg-[#ff6b35] animate-pulse" style="height:40%; animation-delay:0s"></div>
+          <div class="w-1 rounded-full bg-[#ff6b35] animate-pulse" style="height:70%; animation-delay:0.15s"></div>
+          <div class="w-1 rounded-full bg-[#ff6b35] animate-pulse" style="height:50%; animation-delay:0.3s"></div>
+          <div class="w-1 rounded-full bg-[#ff6b35] animate-pulse" style="height:90%; animation-delay:0.1s"></div>
+          <div class="w-1 rounded-full bg-[#ff6b35] animate-pulse" style="height:35%; animation-delay:0.25s"></div>
+          <div class="w-1 rounded-full bg-[#ff6b35] animate-pulse" style="height:65%; animation-delay:0.05s"></div>
+          <div class="w-1 rounded-full bg-[#ff6b35] animate-pulse" style="height:45%; animation-delay:0.2s"></div>
+        </div>
+        <!-- Programs grid - compacte -->
+        <div class="px-4 pb-4">
+          <h2 class="text-xs font-700 uppercase tracking-widest text-gray-500 mb-3">Programes</h2>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="openSection('musica')" class="card-prog anim-in anim-d1 rounded-xl p-3 text-left bg-gradient-to-br from-[#1a1a2e] to-[#16213e] border border-white/5">
+              <div class="w-8 h-8 rounded-lg bg-[#ff6b35]/15 flex items-center justify-center mb-2"><i data-lucide="music" class="w-4 h-4 text-[#ff6b35]"></i></div>
+              <span class="font-700 text-xs text-white">Música</span>
+              <p class="text-[10px] text-gray-500 mt-0.5">Les millors cançons</p>
+            </button>
+            <button onclick="openSection('entrevistes')" class="card-prog anim-in anim-d2 rounded-xl p-3 text-left bg-gradient-to-br from-[#1a2e1a] to-[#0f2918] border border-white/5">
+              <div class="w-8 h-8 rounded-lg bg-emerald-500/15 flex items-center justify-center mb-2"><i data-lucide="mic" class="w-4 h-4 text-emerald-400"></i></div>
+              <span class="font-700 text-xs text-white">Entrevistes</span>
+              <p class="text-[10px] text-gray-500 mt-0.5">Converses en directe</p>
+            </button>
+            <button onclick="openSection('resenyes')" class="card-prog anim-in anim-d3 rounded-xl p-3 text-left bg-gradient-to-br from-[#2e1a2e] to-[#261329] border border-white/5">
+              <div class="w-8 h-8 rounded-lg bg-purple-500/15 flex items-center justify-center mb-2"><i data-lucide="book-open" class="w-4 h-4 text-purple-400"></i></div>
+              <span class="font-700 text-xs text-white">Resenyes</span>
+              <p class="text-[10px] text-gray-500 mt-0.5">Opinions i crítiques</p>
+            </button>
+            <button onclick="openSection('acudits')" class="card-prog anim-in anim-d4 rounded-xl p-3 text-left bg-gradient-to-br from-yellow-500/20 to-orange-400/10 border border-yellow-500/20">
+              <div class="w-8 h-8 rounded-lg bg-yellow-400/20 flex items-center justify-center mb-2"><i data-lucide="laugh" class="w-4 h-4 text-yellow-400"></i></div>
+              <span class="font-700 text-xs">Acudits</span>
+              <p class="text-[10px] text-gray-500 mt-0.5">Riures garantits!</p>
+            </button>
+            <!-- REPORTATGES -->
+            <button onclick="openSection('especials')" class="card-prog anim-in anim-d5 rounded-xl p-3 text-left bg-gradient-to-br from-[#2e2a1a] to-[#29200d] border border-white/10">
+              <div class="w-8 h-8 rounded-lg bg-amber-500/15 flex items-center justify-center mb-2"><i data-lucide="star" class="w-4 h-4 text-amber-400"></i></div>
+              <span class="font-700 text-xs text-white">Reportatges</span>
+              <p class="text-[10px] text-white/60 mt-0.5">Contingut únic!</p>
+            </button>
+            <!-- RGL PLUS -->
+            <button onclick="openSection('rglplus')" class="card-prog anim-in anim-d5 rounded-xl p-3 text-left bg-gradient-to-br from-[#1a0a2e] to-[#0d0618] border border-violet-500/30">
+              <div class="w-8 h-8 rounded-lg bg-violet-500/20 flex items-center justify-center mb-2"><i data-lucide="crown" class="w-4 h-4 text-violet-400"></i></div>
+              <span class="font-700 text-xs text-violet-300">RGL PLUS</span>
+              <p class="text-[10px] text-violet-300/60 mt-0.5">Exclusiu subscriptors</p>
+            </button>
+            <!-- KIDS -->
+            <button onclick="openSection('kids')" class="card-prog anim-in anim-d1 rounded-xl p-3 text-left bg-gradient-to-br from-pink-400 to-purple-500 border border-white/10">
+              <div class="w-8 h-8 rounded-lg bg-white/30 flex items-center justify-center mb-2"><i data-lucide="smile" class="w-4 h-4 text-white"></i></div>
+              <span class="font-700 text-xs text-white">🎉 KIDS</span>
+              <p class="text-[10px] text-white/80 mt-0.5">Diversió per a nens!</p>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MUSICA PAGE -->
+    <div class="page" id="page-musica">
+      <div class="flex-1 overflow-y-auto">
+        <div class="section-hero h-48 bg-gradient-to-br from-[#ff6b35] to-[#e8451c] flex flex-col justify-end p-5">
+          <div class="section-hero-content">
+            <button onclick="goHome()" class="mb-3 w-9 h-9 rounded-full bg-black/30 flex items-center justify-center backdrop-blur-sm"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
+            <h1 class="text-3xl font-900 text-white">🎵 Música</h1>
+            <p class="text-sm text-white/70 mt-1">Les millors cançons seleccionades per tu</p>
+          </div>
+        </div>
+        <div class="p-5 space-y-3">
+          <a href="https://drive.google.com/drive/folders/1S0Ue3TiCesmPsKsGVz8ndrKmnhU1ypW8?usp=drive_link" target="_blank" rel="noopener noreferrer" class="flex items-center gap-4 bg-white/5 rounded-xl p-4 border border-white/5 active:bg-white/10 transition">
+            <div class="w-12 h-12 rounded-xl bg-[#ff6b35]/20 flex items-center justify-center shrink-0"><i data-lucide="play" class="w-5 h-5 text-[#ff6b35]"></i></div>
+            <div class="flex-1"><span class="font-700 text-sm">Escoltar Música</span><p class="text-xs text-gray-500 mt-0.5">Accedeix als continguts</p></div>
+            <i data-lucide="external-link" class="w-4 h-4 text-gray-600"></i>
+          </a>
+          <a href="https://formularimusica-rgl.edgeone.dev" target="_blank" rel="noopener noreferrer" class="flex items-center gap-4 bg-white/5 rounded-xl p-4 border border-white/5 active:bg-white/10 transition">
+            <div class="w-12 h-12 rounded-xl bg-[#ff6b35]/20 flex items-center justify-center shrink-0"><i data-lucide="music-4" class="w-5 h-5 text-[#ff6b35]"></i></div>
+            <div class="flex-1"><span class="font-700 text-sm">Demanar una cançó</span><p class="text-xs text-gray-500 mt-0.5">Omple el formulari</p></div>
+            <i data-lucide="external-link" class="w-4 h-4 text-gray-600"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENTREVISTES PAGE -->
+    <div class="page" id="page-entrevistes">
+      <div class="flex-1 overflow-y-auto">
+        <div class="section-hero h-48 bg-gradient-to-br from-emerald-600 to-emerald-800 flex flex-col justify-end p-5">
+          <div class="section-hero-content">
+            <button onclick="goHome()" class="mb-3 w-9 h-9 rounded-full bg-black/30 flex items-center justify-center backdrop-blur-sm"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
+            <h1 class="text-3xl font-900 text-white">🎙️ Entrevistes</h1>
+            <p class="text-sm text-white/70 mt-1">Converses amb personalitats</p>
+          </div>
+        </div>
+        <div class="p-5 space-y-3">
+          <a href="https://drive.google.com/drive/folders/1AUoh6ciGT0WS5-CgQC-l1arCZOGcy1BG?usp=drive_link" target="_blank" rel="noopener noreferrer" class="flex items-center gap-4 bg-white/5 rounded-xl p-4 border border-white/5 active:bg-white/10 transition">
+            <div class="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center shrink-0"><i data-lucide="play" class="w-5 h-5 text-emerald-400"></i></div>
+            <div class="flex-1"><span class="font-700 text-sm">Escoltar Entrevistes</span><p class="text-xs text-gray-500 mt-0.5">Accedeix als continguts</p></div>
+            <i data-lucide="external-link" class="w-4 h-4 text-gray-600"></i>
+          </a>
+          <a href="https://formularientrevista-rgl.edgeone.dev" target="_blank" rel="noopener noreferrer" class="flex items-center gap-4 bg-white/5 rounded-xl p-4 border border-white/5 active:bg-white/10 transition">
+            <div class="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center shrink-0"><i data-lucide="mic-vocal" class="w-5 h-5 text-emerald-400"></i></div>
+            <div class="flex-1"><span class="font-700 text-sm">Demanar una entrevista</span><p class="text-xs text-gray-500 mt-0.5">Omple el formulari</p></div>
+            <i data-lucide="external-link" class="w-4 h-4 text-gray-600"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESENYES PAGE -->
+    <div class="page" id="page-resenyes">
+      <div class="flex-1 overflow-y-auto">
+        <div class="section-hero h-48 bg-gradient-to-br from-purple-600 to-purple-900 flex flex-col justify-end p-5">
+          <div class="section-hero-content">
+            <button onclick="goHome()" class="mb-3 w-9 h-9 rounded-full bg-black/30 flex items-center justify-center backdrop-blur-sm"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
+            <h1 class="text-3xl font-900 text-white">📖 Resenyes</h1>
+            <p class="text-sm text-white/70 mt-1">Opinions i crítiques culturals</p>
+          </div>
+        </div>
+        <div class="p-5 space-y-3">
+          <a href="https://drive.google.com/drive/folders/1q3r9Zg0jj1IbtstWO134LolP2LjxADGC?usp=drive_link" target="_blank" rel="noopener noreferrer" class="flex items-center gap-4 bg-white/5 rounded-xl p-4 border border-white/5 active:bg-white/10 transition">
+            <div class="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center shrink-0"><i data-lucide="play" class="w-5 h-5 text-purple-400"></i></div>
+            <div class="flex-1"><span class="font-700 text-sm">Escoltar Resenyes</span><p class="text-xs text-gray-500 mt-0.5">Accedeix als continguts</p></div>
+            <i data-lucide="external-link" class="w-4 h-4 text-gray-600"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORTATGES PAGE -->
+    <div class="page" id="page-especials">
+      <div class="flex-1 overflow-y-auto">
+        <div class="section-hero h-48 bg-gradient-to-br from-amber-600 to-amber-900 flex flex-col justify-end p-5">
+          <div class="section-hero-content">
+            <button onclick="goHome()" class="mb-3 w-9 h-9 rounded-full bg-black/30 flex items-center justify-center backdrop-blur-sm"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
+            <h1 class="text-3xl font-900 text-white">⭐ Reportatges</h1>
+            <p class="text-sm text-white/70 mt-1">Contingut exclusiu i únic</p>
+          </div>
+        </div>
+        <div class="p-5 space-y-3">
+          <a href="https://drive.google.com/drive/folders/1Zpn4D2ilP1pekjXmRU66rpyOC-czQgdT?usp=drive_link" target="_blank" rel="noopener noreferrer" class="flex items-center gap-4 bg-white/5 rounded-xl p-4 border border-white/5 active:bg-white/10 transition">
+            <div class="w-12 h-12 rounded-xl bg-amber-500/20 flex items-center justify-center shrink-0"><i data-lucide="play" class="w-5 h-5 text-amber-400"></i></div>
+            <div class="flex-1"><span class="font-700 text-sm">Escoltar Reportatges</span><p class="text-xs text-gray-500 mt-0.5">Accedeix als continguts</p></div>
+            <i data-lucide="external-link" class="w-4 h-4 text-gray-600"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACUDITS PAGE -->
+    <div class="page" id="page-acudits">
+      <div class="flex-1 overflow-y-auto">
+        <div class="section-hero h-48 bg-gradient-to-br from-yellow-400 to-orange-500 flex flex-col justify-end p-5">
+          <div class="section-hero-content">
+            <button onclick="goHome()" class="mb-3 w-9 h-9 rounded-full bg-black/30 flex items-center justify-center backdrop-blur-sm"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
+            <h1 class="text-3xl font-900 text-white">😂 Acudits</h1>
+            <p class="text-sm text-white/70 mt-1">Riures garantits cada dia!</p>
+          </div>
+        </div>
+        <div class="p-5 space-y-4">
+          <a href="https://drive.google.com/drive/folders/1wbv6_MC31yEh09vD43diGj4epZbveF25?usp=sharing" target="_blank" rel="noopener noreferrer" class="flex items-center gap-4 bg-white/5 rounded-xl p-4 border border-white/5 active:bg-white/10 transition">
+            <div class="w-12 h-12 rounded-xl bg-yellow-400/20 flex items-center justify-center shrink-0"><i data-lucide="play" class="w-5 h-5 text-yellow-400"></i></div>
+            <div class="flex-1"><span class="font-700 text-sm">Escoltar Acudits</span><p class="text-xs text-gray-500 mt-0.5">Accedeix als continguts</p></div>
+            <i data-lucide="external-link" class="w-4 h-4 text-gray-600"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- RGL PLUS PAGE -->
+    <div class="page" id="page-rglplus">
+      <div class="flex-1 overflow-y-auto">
+        <div class="section-hero h-48 bg-gradient-to-br from-violet-700 to-violet-950 flex flex-col justify-end p-5">
+          <div class="section-hero-content">
+            <button onclick="goHome()" class="mb-3 w-9 h-9 rounded-full bg-black/30 flex items-center justify-center backdrop-blur-sm"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
+            <h1 class="text-3xl font-900 text-white">👑 RGL PLUS</h1>
+            <p class="text-sm text-white/70 mt-1">Contingut exclusiu per subscriptors</p>
+          </div>
+        </div>
+        <!-- LOCKED VIEW -->
+        <div id="rglplus-locked" class="p-5 space-y-5">
+          <div class="bg-violet-500/10 border border-violet-500/20 rounded-2xl p-5">
+            <p class="text-sm opacity-80 leading-relaxed">En aquesta secció tenim uns programes extres que per accedir-hi teniu dos opcions, o comprar una subscripció tocant <button onclick="openSubsPopup()" class="text-violet-400 font-700 underline underline-offset-2">aquí</button>, o si heu participat i heu guanyat l'accés gratuïtament heu d'introduir la contrasenya directament, a continuació.</p>
+          </div>
+          <div class="space-y-3">
+            <label class="text-xs font-700 uppercase tracking-widest text-violet-400">Contrasenya</label>
+            <div class="flex gap-2">
+              <input id="rglplus-input" type="password" placeholder="Introdueix la contrasenya..." class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm placeholder-gray-600 outline-none focus:border-violet-500/50">
+              <button onclick="checkRglPass()" class="bg-violet-600 hover:bg-violet-500 active:scale-95 transition px-4 rounded-xl font-700 text-sm text-white">Entrar</button>
+            </div>
+            <p id="rglplus-error" class="text-xs text-red-400 hidden">Contrasenya incorrecta. Torna-ho a intentar.</p>
+          </div>
+        </div>
+        <!-- UNLOCKED VIEW -->
+        <div id="rglplus-unlocked" class="p-5 space-y-3 hidden">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="w-2 h-2 rounded-full bg-violet-400 animate-pulse"></div>
+            <span class="text-xs font-700 text-violet-400 uppercase tracking-widest">Accés concedit</span>
+          </div>
+          <a href="https://radioglcoll.wixsite.com/radio-gl-plus" id="rglplus-link" target="_blank" rel="noopener noreferrer" class="flex items-center gap-4 bg-white/5 rounded-xl p-4 border border-white/5 active:bg-white/10 transition">
+            <div class="w-12 h-12 rounded-xl bg-violet-500/20 flex items-center justify-center shrink-0"><i data-lucide="play" class="w-5 h-5 text-violet-400"></i></div>
+            <div class="flex-1"><span class="font-700 text-sm">Escoltar RGL Plus</span><p class="text-xs text-gray-500 mt-0.5">Accedeix als continguts</p></div>
+            <i data-lucide="external-link" class="w-4 h-4 text-gray-600"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- KIDS PAGE -->
+    <div class="page" id="page-kids">
+      <div class="flex-1 overflow-y-auto">
+        <div class="section-hero h-48 bg-gradient-to-br from-pink-400 via-purple-400 to-indigo-500 flex flex-col justify-end p-5">
+          <div class="section-hero-content">
+            <button onclick="goHome()" class="mb-3 w-9 h-9 rounded-full bg-white/30 flex items-center justify-center backdrop-blur-sm"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
+            <h1 class="text-4xl font-900 text-white">🎉 KIDS</h1>
+            <p class="text-sm text-white/90 mt-1">Hola, què vols fer avui?</p>
+          </div>
+        </div>
+        <div class="p-5">
+          <div class="grid grid-cols-1 gap-4">
+            <button onclick="openKidsGame()" class="flex items-center gap-4 bg-gradient-to-br from-pink-400 to-rose-400 rounded-3xl p-6 border-4 border-white/30 active:scale-95 transition transform">
+              <div class="w-16 h-16 rounded-2xl bg-white/40 flex items-center justify-center shrink-0 text-3xl">🎮</div>
+              <div class="flex-1 text-left"><span class="font-900 text-lg text-white">JUGAR</span><p class="text-sm text-white/80 mt-0.5">Jocs interactius</p></div>
+              <i data-lucide="arrow-right" class="w-5 h-5 text-white"></i>
+            </button>
+            <button onclick="openKidsMirar()" class="flex items-center gap-4 bg-gradient-to-br from-purple-400 to-blue-400 rounded-3xl p-6 border-4 border-white/30 active:scale-95 transition transform">
+              <div class="w-16 h-16 rounded-2xl bg-white/40 flex items-center justify-center shrink-0 text-3xl">👀</div>
+              <div class="flex-1 text-left">
+                <span class="font-900 text-lg text-white">MIRAR</span>
+                <p class="text-sm text-white/80 mt-0.5">Sèries i dibuixos</p>
+              </div>
+              <i data-lucide="arrow-right" class="w-5 h-5 text-white"></i>
+            </button>
+            <a href="https://drive.google.com/drive/folders/1L0gSBqxwxI9R_V6oJk5szEB1mj7wInp2?usp=drive_link" target="_blank" rel="noopener noreferrer" class="flex items-center gap-4 bg-gradient-to-br from-indigo-400 to-pink-400 rounded-3xl p-6 border-4 border-white/30 active:scale-95 transition transform">
+              <div class="w-16 h-16 rounded-2xl bg-white/40 flex items-center justify-center shrink-0 text-3xl">🎵</div>
+              <div class="flex-1 text-left"><span class="font-900 text-lg text-white">ESCOLTAR</span><p class="text-sm text-white/80 mt-0.5">Cançons i històries</p></div>
+              <i data-lucide="arrow-right" class="w-5 h-5 text-white"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KIDS MIRAR PAGE (Netflix-style) -->
+    <div class="page" id="page-kids-mirar">
+      <div class="flex-1 overflow-y-auto">
+        <div class="section-hero h-40 bg-gradient-to-br from-purple-400 via-blue-400 to-indigo-500 flex flex-col justify-end p-5">
+          <div class="section-hero-content">
+            <button onclick="backToKids()" class="mb-3 w-9 h-9 rounded-full bg-white/30 flex items-center justify-center backdrop-blur-sm"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
+            <h1 class="text-3xl font-900 text-white">👀 Mirar</h1>
+            <p class="text-sm text-white/90 mt-1">Sèries i pel·lícules per a nens</p>
+          </div>
+        </div>
+        <!-- Tabs -->
+        <div class="flex gap-2 px-5 pt-4">
+          <button id="mirar-tab-series" onclick="switchMirarTab('series')" class="flex-1 py-2.5 rounded-xl font-700 text-sm bg-white text-black transition">Sèries</button>
+          <button id="mirar-tab-movies" onclick="switchMirarTab('movies')" class="flex-1 py-2.5 rounded-xl font-700 text-sm bg-white/10 text-white transition">Pel·lícules</button>
+        </div>
+        <div class="py-5">
+          <div class="grid grid-cols-3 gap-3 px-5" id="mirar-row"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KIDS SERIES EPISODES PAGE -->
+    <div class="page" id="page-kids-episodes">
+      <div class="flex-1 overflow-y-auto">
+        <div class="section-hero h-40 bg-gradient-to-br from-purple-400 via-blue-400 to-indigo-500 flex flex-col justify-end p-5">
+          <div class="section-hero-content">
+            <button onclick="openKidsMirar()" class="mb-3 w-9 h-9 rounded-full bg-white/30 flex items-center justify-center backdrop-blur-sm"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
+            <h1 class="text-2xl font-900 text-white" id="episodes-title"></h1>
+            <p class="text-sm text-white/90 mt-1">Tria un capítol</p>
+          </div>
+        </div>
+        <div class="p-5 space-y-3" id="episodes-list"></div>
+      </div>
+    </div>
+
+    <!-- KIDS VIDEO PLAYER PAGE -->
+    <div class="page" id="page-kids-player">
+      <div class="flex-1 flex flex-col p-4">
+        <button onclick="stopKidsPlayer()" class="mb-3 w-9 h-9 rounded-full bg-purple-500/30 flex items-center justify-center shrink-0"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
+        <div class="rounded-2xl overflow-hidden bg-black" style="aspect-ratio: 16/9;">
+          <iframe id="kids-player-iframe" width="100%" height="100%" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="display:block;"></iframe>
+        </div>
+        <h2 class="text-lg font-900 mt-4" id="kids-player-title"></h2>
+      </div>
+    </div>
+
+    <!-- GAMES PAGE -->
+    <div class="page" id="page-kids-games">
+      <div class="flex-1 overflow-y-auto">
+        <div class="section-hero h-40 bg-gradient-to-br from-pink-400 via-purple-400 to-indigo-500 flex flex-col justify-end p-5">
+          <div class="section-hero-content">
+            <button onclick="backToKids()" class="mb-3 w-9 h-9 rounded-full bg-white/30 flex items-center justify-center backdrop-blur-sm"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
+            <h1 class="text-3xl font-900 text-white">🎮 JUGAR</h1>
+            <p class="text-sm text-white/90 mt-1">Tria un joc!</p>
+          </div>
+        </div>
+        <div class="p-5 space-y-4">
+          <button onclick="startGame('memori')" class="w-full text-left bg-gradient-to-br from-pink-500 to-rose-500 rounded-2xl p-6 border-2 border-white/30 active:scale-95 transition transform">
+            <div class="flex items-center gap-3 mb-2"><span class="text-3xl">🎲</span><span class="font-900 text-lg text-white">Memòria</span></div>
+            <p class="text-sm text-white/80">Recorda les cartes!</p>
+          </button>
+          <button onclick="startGame('colors')" class="w-full text-left bg-gradient-to-br from-purple-500 to-blue-500 rounded-2xl p-6 border-2 border-white/30 active:scale-95 transition transform">
+            <div class="flex items-center gap-3 mb-2"><span class="text-3xl">🎨</span><span class="font-900 text-lg text-white">Joc de Colors</span></div>
+            <p class="text-sm text-white/80">Tria el color correcte!</p>
+          </button>
+          <button onclick="startGame('numeros')" class="w-full text-left bg-gradient-to-br from-indigo-500 to-pink-500 rounded-2xl p-6 border-2 border-white/30 active:scale-95 transition transform">
+            <div class="flex items-center gap-3 mb-2"><span class="text-3xl">🔢</span><span class="font-900 text-lg text-white">Sèrie de Números</span></div>
+            <p class="text-sm text-white/80">Encerta la seqüència!</p>
+          </button>
+          <button onclick="startGame('comptar')" class="w-full text-left bg-gradient-to-br from-green-500 to-teal-500 rounded-2xl p-6 border-2 border-white/30 active:scale-95 transition transform">
+            <div class="flex items-center gap-3 mb-2"><span class="text-3xl">🍎</span><span class="font-900 text-lg text-white">Comptar</span></div>
+            <p class="text-sm text-white/80">Compta els objectes!</p>
+          </button>
+          <button onclick="startGame('serp')" class="w-full text-left bg-gradient-to-br from-yellow-500 to-orange-500 rounded-2xl p-6 border-2 border-white/30 active:scale-95 transition transform">
+            <div class="flex items-center gap-3 mb-2"><span class="text-3xl">🐍</span><span class="font-900 text-lg text-white">Serp</span></div>
+            <p class="text-sm text-white/80">Guia la serp fins a menjar!</p>
+          </button>
+          <button onclick="startGame('laberint')" class="w-full text-left bg-gradient-to-br from-red-500 to-pink-500 rounded-2xl p-6 border-2 border-white/30 active:scale-95 transition transform">
+            <div class="flex items-center gap-3 mb-2"><span class="text-3xl">🎯</span><span class="font-900 text-lg text-white">Laberint</span></div>
+            <p class="text-sm text-white/80">Guia la bola fins al final!</p>
+          </button>
+          <button onclick="startGame('abecedari')" class="w-full text-left bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl p-6 border-2 border-white/30 active:scale-95 transition transform">
+            <div class="flex items-center gap-3 mb-2"><span class="text-3xl">🅰️</span><span class="font-900 text-lg text-white">Abecedari</span></div>
+            <p class="text-sm text-white/80">Aprèn les lletres!</p>
+          </button>
+          <button onclick="startGame('topamoles')" class="w-full text-left bg-gradient-to-br from-lime-500 to-green-600 rounded-2xl p-6 border-2 border-white/30 active:scale-95 transition transform">
+            <div class="flex items-center gap-3 mb-2"><span class="text-3xl">🐹</span><span class="font-900 text-lg text-white">Topa Moles!</span></div>
+            <p class="text-sm text-white/80">Toca els moles quan surtin!</p>
+          </button>
+          <button onclick="startGame('pong')" class="w-full text-left bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl p-6 border-2 border-white/30 active:scale-95 transition transform">
+            <div class="flex items-center gap-3 mb-2"><span class="text-3xl">🏓</span><span class="font-900 text-lg text-white">Pong</span></div>
+            <p class="text-sm text-white/80">1 jugador o 2 jugadors!</p>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MEMORI GAME -->
+    <div class="page" id="page-game-memori">
+      <div class="flex-1 overflow-y-auto flex flex-col p-5">
+        <button onclick="backToKidsGames()" class="mb-4 w-9 h-9 rounded-full bg-pink-500/30 flex items-center justify-center"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
+        <h1 class="text-2xl font-900 text-center mb-4">🎲 Joc de Memòria</h1>
+        <div class="grid grid-cols-4 gap-2 flex-1" id="memori-grid"></div>
+      </div>
+    </div>
+
+    <!-- COLORS GAME -->
+    <div class="page" id="page-game-colors">
+      <div class="flex-1 overflow-y-auto flex flex-col p-5 justify-center items-center">
+        <button onclick="backToKidsGames()" class="absolute top-5 left-5 w-9 h-9 rounded-full bg-purple-500/30 flex items-center justify-center"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
+        <h1 class="text-2xl font-900 text-center mb-6">🎨 Joc de Colors</h1>
+        <p class="text-center opacity-80 mb-8" id="color-instruction">Clica el color <span id="target-color" class="font-900"></span></p>
+        <div class="grid grid-cols-2 gap-6" id="colors-grid"><button class="w-24 h-24 rounded-2xl"></button></div>
+        <p class="text-center opacity-60 mt-8" id="color-score">Puntuació: 0</p>
+      </div>
+    </div>
+
+    <!-- NUMEROS GAME -->
+    <div class="page" id="page-game-numeros">
+      <div class="flex-1 overflow-y-auto flex flex-col p-5 justify-center items-center">
+        <button onclick="backToKidsGames()" class="absolute top-5 left-5 w-9 h-9 rounded-full bg-indigo-500/30 flex items-center justify-center"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
+        <h1 class="text-2xl font-900 text-center mb-6">🔢 Seqüència de Números</h1>
+        <p class="text-center opacity-80 mb-8" id="numeros-instruction">Segueix la seqüència!</p>
+        <div class="grid grid-cols-4 gap-3 mb-8" id="numeros-grid"></div>
+        <p class="text-center opacity-60 mt-4" id="numeros-score">Puntuació: 0</p>
+      </div>
+    </div>
+
+    <!-- COMPTAR GAME -->
+    <div class="page" id="page-game-comptar">
+      <div class="flex-1 overflow-y-auto flex flex-col p-5 justify-center items-center">
+        <button onclick="backToKidsGames()" class="absolute top-5 left-5 w-9 h-9 rounded-full bg-green-500/30 flex items-center justify-center"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
+        <h1 class="text-2xl font-900 text-center mb-6">🍎 Comptar</h1>
+        <p class="text-center opacity-80 mb-8" id="comptar-question">Quants hi ha?</p>
+        <div class="flex flex-wrap gap-4 justify-center mb-8" id="comptar-items"></div>
+        <div class="grid grid-cols-3 gap-4 mb-8" id="comptar-answers"></div>
+        <p class="text-center opacity-60" id="comptar-score">Puntuació: 0</p>
+      </div>
+    </div>
+
+    <!-- LABERINT GAME -->
+    <div class="page" id="page-game-laberint">
+      <div class="flex-1 flex flex-col p-4">
+        <div class="flex items-center gap-3 mb-3">
+          <button onclick="stopLaberint(); backToKidsGames();" class="w-9 h-9 rounded-full bg-red-500/30 flex items-center justify-center shrink-0"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
+          <h1 class="text-2xl font-900">🎯 Laberint</h1>
+          <span class="ml-auto text-sm opacity-60" id="laberint-score">Nivell 1</span>
+        </div>
+        <canvas id="laberint-canvas" class="rounded-2xl border-2 border-white/20 mb-3" style="display:block; width:100%; max-width:340px; margin:0 auto;"></canvas>
+        <!-- D-pad controls -->
+        <div class="flex flex-col items-center gap-1 mt-1">
+          <button ontouchstart="labMove('up')" onclick="labMove('up')" class="w-14 h-14 rounded-xl bg-red-500/70 flex items-center justify-center active:scale-90 transition select-none"><i data-lucide="arrow-up" class="w-6 h-6 text-white"></i></button>
+          <div class="flex gap-1">
+            <button ontouchstart="labMove('left')" onclick="labMove('left')" class="w-14 h-14 rounded-xl bg-red-500/70 flex items-center justify-center active:scale-90 transition select-none"><i data-lucide="arrow-left" class="w-6 h-6 text-white"></i></button>
+            <div class="w-14 h-14"></div>
+            <button ontouchstart="labMove('right')" onclick="labMove('right')" class="w-14 h-14 rounded-xl bg-red-500/70 flex items-center justify-center active:scale-90 transition select-none"><i data-lucide="arrow-right" class="w-6 h-6 text-white"></i></button>
+          </div>
+          <button ontouchstart="labMove('down')" onclick="labMove('down')" class="w-14 h-14 rounded-xl bg-red-500/70 flex items-center justify-center active:scale-90 transition select-none"><i data-lucide="arrow-down" class="w-6 h-6 text-white"></i></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABECEDARI GAME -->
+    <div class="page" id="page-game-abecedari">
+      <div class="flex-1 overflow-y-auto flex flex-col p-5 justify-center items-center">
+        <button onclick="backToKidsGames()" class="absolute top-5 left-5 w-9 h-9 rounded-full bg-blue-500/30 flex items-center justify-center"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
+        <h1 class="text-2xl font-900 text-center mb-6">🅰️ Abecedari</h1>
+        <p class="text-center opacity-80 mb-8" id="abecedari-instruction">Tria la lletra correcta!</p>
+        <p class="text-6xl font-900 text-center mb-8 text-[#ff6b35]" id="abecedari-target">A</p>
+        <div class="grid grid-cols-3 gap-4 mb-8" id="abecedari-options"></div>
+        <p class="text-center opacity-60" id="abecedari-score">Puntuació: 0</p>
+      </div>
+    </div>
+
+    <!-- TOPA MOLES GAME -->
+    <div class="page" id="page-game-topamoles">
+      <div class="flex-1 overflow-y-auto flex flex-col p-5 items-center">
+        <div class="w-full flex items-center gap-3 mb-4">
+          <button onclick="stopTopaMoles(); backToKidsGames();" class="w-9 h-9 rounded-full bg-lime-500/30 flex items-center justify-center shrink-0"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
+          <h1 class="text-2xl font-900">🐹 Topa Moles!</h1>
+        </div>
+        <div class="flex justify-between w-full mb-4 px-1">
+          <div class="bg-white/10 rounded-xl px-4 py-2 text-center">
+            <div class="text-xs text-gray-400">Puntuació</div>
+            <div class="text-xl font-900 text-lime-400" id="topamoles-score">0</div>
+          </div>
+          <div class="bg-white/10 rounded-xl px-4 py-2 text-center">
+            <div class="text-xs text-gray-400">Temps</div>
+            <div class="text-xl font-900 text-orange-400" id="topamoles-time">30</div>
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-3 w-full max-w-xs mb-4" id="topamoles-grid"></div>
+        <button onclick="startTopaMoles()" id="topamoles-startbtn" class="bg-gradient-to-r from-lime-400 to-green-500 text-black font-900 px-8 py-3 rounded-2xl text-base active:scale-95 transition">
+          Jugar!
+        </button>
+      </div>
+    </div>
+
+    <!-- SERP GAME -->
+    <div class="page" id="page-game-serp">
+      <div class="flex-1 overflow-y-auto flex flex-col p-5">
+        <button onclick="backToKidsGames()" class="mb-4 w-9 h-9 rounded-full bg-yellow-500/30 flex items-center justify-center"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
+        <h1 class="text-2xl font-900 text-center mb-4">🐍 Serp</h1>
+        <p class="text-center opacity-80 mb-4 text-sm" id="serp-instruction">Guia la serp amb els botons!</p>
+        <canvas id="serp-canvas" class="w-full bg-black rounded-2xl border-2 border-white/20 mb-4" style="max-width: 400px; margin: 0 auto; display: block;"></canvas>
+        <p class="text-center opacity-60 mb-4" id="serp-score">Puntuació: 0</p>
+        <div class="flex flex-col items-center gap-2">
+          <button onclick="setSnakeDirection('UP')" class="w-14 h-14 rounded-lg bg-yellow-500 flex items-center justify-center font-bold text-lg active:scale-90 transition"><i data-lucide="arrow-up" class="w-6 h-6 text-black"></i></button>
+          <div class="flex gap-2">
+            <button onclick="setSnakeDirection('LEFT')" class="w-14 h-14 rounded-lg bg-yellow-500 flex items-center justify-center font-bold text-lg active:scale-90 transition"><i data-lucide="arrow-left" class="w-6 h-6 text-black"></i></button>
+            <button onclick="setSnakeDirection('DOWN')" class="w-14 h-14 rounded-lg bg-yellow-500 flex items-center justify-center font-bold text-lg active:scale-90 transition"><i data-lucide="arrow-down" class="w-6 h-6 text-black"></i></button>
+            <button onclick="setSnakeDirection('RIGHT')" class="w-14 h-14 rounded-lg bg-yellow-500 flex items-center justify-center font-bold text-lg active:scale-90 transition"><i data-lucide="arrow-right" class="w-6 h-6 text-black"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PONG GAME -->
+    <div class="page" id="page-game-pong">
+      <div class="flex-1 flex flex-col p-4">
+        <div class="flex items-center gap-3 mb-2">
+          <button onclick="stopPong(); backToKidsGames();" class="w-9 h-9 rounded-full bg-cyan-500/30 flex items-center justify-center shrink-0"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
+          <h1 class="text-2xl font-900">🏓 Pong</h1>
+        </div>
+        <!-- Mode selector -->
+        <div id="pong-menu" class="flex-1 flex flex-col items-center justify-center gap-4">
+          <p class="opacity-60 text-sm">Tria el mode de joc</p>
+          <button onclick="startPong(false)" class="w-full max-w-xs bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-900 py-4 rounded-2xl text-base active:scale-95 transition">
+            🤖 1 Jugador (vs CPU)
+          </button>
+          <button onclick="startPong(true)" class="w-full max-w-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white font-900 py-4 rounded-2xl text-base active:scale-95 transition">
+            👥 2 Jugadors (mateix mòbil)
+          </button>
+          <p id="pong-lastscore" class="opacity-40 text-xs mt-2"></p>
+        </div>
+        <!-- Game area -->
+        <div id="pong-game" class="hidden flex-1 flex flex-col">
+          <div class="flex justify-between mb-1 px-1">
+            <div class="text-center">
+              <div class="text-xs text-gray-400" id="pong-label-left">Jugador 1</div>
+              <div class="text-2xl font-900 text-cyan-400" id="pong-score-left">0</div>
+            </div>
+            <div class="text-center">
+              <div class="text-xs text-gray-400" id="pong-label-right">CPU</div>
+              <div class="text-2xl font-900 text-pink-400" id="pong-score-right">0</div>
+            </div>
+          </div>
+          <canvas id="pong-canvas" class="rounded-xl border border-white/10 mb-2" style="display:block; width:100%; max-width:340px; margin:0 auto;"></canvas>
+          <!-- Controls info -->
+          <div class="flex justify-between px-2 mb-2" id="pong-controls-info">
+            <span class="text-[10px] opacity-40" id="pong-hint-left">◀▶ Botons</span>
+            <span class="text-[10px] opacity-40" id="pong-hint-right">CPU automàtic</span>
+          </div>
+          <!-- Player 1 controls -->
+          <div class="flex justify-center gap-3 mb-1" id="pong-ctrl-p1">
+            <button ontouchstart="pongP1(-1)" ontouchend="pongP1(0)" onmousedown="pongP1(-1)" onmouseup="pongP1(0)" class="w-16 h-12 rounded-xl bg-cyan-500/60 flex items-center justify-center active:scale-90 transition select-none text-lg font-900">◀</button>
+            <button ontouchstart="pongP1(1)" ontouchend="pongP1(0)" onmousedown="pongP1(1)" onmouseup="pongP1(0)" class="w-16 h-12 rounded-xl bg-cyan-500/60 flex items-center justify-center active:scale-90 transition select-none text-lg font-900">▶</button>
+          </div>
+          <!-- Player 2 controls (multiplayer only) -->
+          <div class="flex justify-center gap-3" id="pong-ctrl-p2" style="display:none!important">
+            <button ontouchstart="pongP2(-1)" ontouchend="pongP2(0)" onmousedown="pongP2(-1)" onmouseup="pongP2(0)" class="w-16 h-12 rounded-xl bg-pink-500/60 flex items-center justify-center active:scale-90 transition select-none text-lg font-900">◀</button>
+            <button ontouchstart="pongP2(1)" ontouchend="pongP2(0)" onmousedown="pongP2(1)" onmouseup="pongP2(0)" class="w-16 h-12 rounded-xl bg-pink-500/60 flex items-center justify-center active:scale-90 transition select-none text-lg font-900">▶</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MES PAGE (menu) -->
+    <div class="page" id="page-mes">
+      <div class="flex-1 overflow-y-auto">
+        <div class="section-hero h-48 bg-gradient-to-br from-sky-600 to-sky-900 flex flex-col justify-end p-5">
+          <div class="section-hero-content">
+            <button onclick="goHome()" class="mb-3 w-9 h-9 rounded-full bg-black/30 flex items-center justify-center backdrop-blur-sm"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
+            <h1 class="text-3xl font-900 text-white">⋯ Més</h1>
+            <p class="text-sm text-white/70 mt-1">Suport, comunicació i donatius</p>
+          </div>
+        </div>
+        <div class="p-5 space-y-3">
+          <button onclick="openMesSub('suport')" class="w-full flex items-center gap-4 bg-white/5 rounded-xl p-4 border border-white/5 active:scale-[0.98] transition">
+            <div class="w-12 h-12 rounded-xl bg-sky-500/20 flex items-center justify-center shrink-0"><i data-lucide="help-circle" class="w-5 h-5 text-sky-400"></i></div>
+            <div class="flex-1 text-left"><span class="font-700 text-sm">Suport</span><p class="text-xs text-gray-500 mt-0.5">Videotutorials, documents i ajuda</p></div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-gray-500 shrink-0"></i>
+          </button>
+          <button onclick="openMesSub('comunicacio')" class="w-full flex items-center gap-4 bg-white/5 rounded-xl p-4 border border-white/5 active:scale-[0.98] transition">
+            <div class="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center shrink-0"><i data-lucide="messages-square" class="w-5 h-5 text-emerald-400"></i></div>
+            <div class="flex-1 text-left"><span class="font-700 text-sm">Comunicació</span><p class="text-xs text-gray-500 mt-0.5">Contacte i grup de novetats</p></div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-gray-500 shrink-0"></i>
+          </button>
+          <button onclick="openMesSub('donatius')" class="w-full flex items-center gap-4 bg-white/5 rounded-xl p-4 border border-white/5 active:scale-[0.98] transition">
+            <div class="w-12 h-12 rounded-xl bg-amber-500/20 flex items-center justify-center shrink-0"><i data-lucide="heart-handshake" class="w-5 h-5 text-amber-400"></i></div>
+            <div class="flex-1 text-left"><span class="font-700 text-sm">Donatius</span><p class="text-xs text-gray-500 mt-0.5">Ajuda a la Ràdio GL</p></div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-gray-500 shrink-0"></i>
+          </button>
+          <a href="https://sites.google.com/view/radio-gl" target="_blank" rel="noopener noreferrer" class="w-full flex items-center gap-4 bg-white/5 rounded-xl p-4 border border-white/5 active:scale-[0.98] transition">
+            <div class="w-12 h-12 rounded-xl bg-violet-500/20 flex items-center justify-center shrink-0"><i data-lucide="globe" class="w-5 h-5 text-violet-400"></i></div>
+            <div class="flex-1 text-left"><span class="font-700 text-sm">Pàgina web de la Ràdio</span><p class="text-xs text-gray-500 mt-0.5">sites.google.com/view/radio-gl</p></div>
+            <i data-lucide="arrow-up-right" class="w-4 h-4 text-gray-500 shrink-0"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- MES > SUPORT SUBPAGE -->
+    <div class="page" id="page-mes-suport">
+      <div class="flex-1 overflow-y-auto">
+        <div class="section-hero h-48 bg-gradient-to-br from-sky-600 to-sky-900 flex flex-col justify-end p-5">
+          <div class="section-hero-content">
+            <button onclick="backToMes()" class="mb-3 w-9 h-9 rounded-full bg-black/30 flex items-center justify-center backdrop-blur-sm"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
+            <h1 class="text-3xl font-900 text-white">❓ Suport</h1>
+            <p class="text-sm text-white/70 mt-1">Videotutorials, documents i ajuda</p>
+          </div>
+        </div>
+        <div class="p-5 space-y-3">
+          <button onclick="openMesSub('suport-videos')" class="w-full flex items-center gap-4 bg-white/5 rounded-xl p-4 border border-white/5 active:scale-[0.98] transition">
+            <div class="w-12 h-12 rounded-xl bg-sky-500/20 flex items-center justify-center shrink-0"><i data-lucide="play-circle" class="w-5 h-5 text-sky-400"></i></div>
+            <div class="flex-1 text-left"><span class="font-700 text-sm">Videotutorials</span><p class="text-xs text-gray-500 mt-0.5">Vídeos d'ajuda i explicacions</p></div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-gray-500 shrink-0"></i>
+          </button>
+          <a href="https://drive.google.com/file/d/1p0KKeRg_taYU4P47hQmM8SxKaUNrwVy0/view?usp=drive_link" target="_blank" rel="noopener noreferrer" class="flex items-center gap-4 bg-white/5 rounded-xl p-4 border border-white/5 active:scale-[0.98] transition">
+            <div class="w-12 h-12 rounded-xl bg-sky-500/20 flex items-center justify-center shrink-0"><i data-lucide="book" class="w-5 h-5 text-sky-400"></i></div>
+            <div class="flex-1"><span class="font-700 text-sm">Documents</span><p class="text-xs text-gray-500 mt-0.5">Materials i recursos</p></div>
+            <i data-lucide="arrow-up-right" class="w-4 h-4 text-gray-500 shrink-0"></i>
+          </a>
+          <button onclick="openMesSub('suport-faq')" class="w-full flex items-center gap-4 bg-white/5 rounded-xl p-4 border border-white/5 active:scale-[0.98] transition">
+            <div class="w-12 h-12 rounded-xl bg-sky-500/20 flex items-center justify-center shrink-0"><i data-lucide="help-circle" class="w-5 h-5 text-sky-400"></i></div>
+            <div class="flex-1 text-left"><span class="font-700 text-sm">Preguntes freqüents</span><p class="text-xs text-gray-500 mt-0.5">Respostes a dubtes comuns</p></div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-gray-500 shrink-0"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MES > SUPORT > VIDEOTUTORIALS SUBPAGE -->
+    <div class="page" id="page-mes-suport-videos">
+      <div class="flex-1 overflow-y-auto">
+        <div class="section-hero h-48 bg-gradient-to-br from-sky-600 to-sky-900 flex flex-col justify-end p-5">
+          <div class="section-hero-content">
+            <button onclick="openMesSub('suport')" class="mb-3 w-9 h-9 rounded-full bg-black/30 flex items-center justify-center backdrop-blur-sm"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
+            <h1 class="text-3xl font-900 text-white">▶️ Videotutorials</h1>
+            <p class="text-sm text-white/70 mt-1">Vídeos d'ajuda i explicacions</p>
+          </div>
+        </div>
+        <div class="p-5 space-y-3">
+          <a href="https://goodstream.one/embed-1pkua911oc48.html" target="_blank" rel="noopener noreferrer" class="flex items-center gap-4 bg-white/5 rounded-xl p-4 border border-white/5 active:scale-[0.98] transition">
+            <div class="w-12 h-12 rounded-xl bg-sky-500/20 flex items-center justify-center shrink-0"><i data-lucide="play-circle" class="w-5 h-5 text-sky-400"></i></div>
+            <div class="flex-1"><span class="font-700 text-sm">Com utilitzar la Ràdio GL</span></div>
+            <i data-lucide="arrow-up-right" class="w-4 h-4 text-gray-500 shrink-0"></i>
+          </a>
+          <a href="https://goodstream.one/embed-doitgb1dq813.html" target="_blank" rel="noopener noreferrer" class="flex items-center gap-4 bg-white/5 rounded-xl p-4 border border-white/5 active:scale-[0.98] transition">
+            <div class="w-12 h-12 rounded-xl bg-sky-500/20 flex items-center justify-center shrink-0"><i data-lucide="play-circle" class="w-5 h-5 text-sky-400"></i></div>
+            <div class="flex-1"><span class="font-700 text-sm">Com instal·lar l'app de la RGL (Android)</span></div>
+            <i data-lucide="arrow-up-right" class="w-4 h-4 text-gray-500 shrink-0"></i>
+          </a>
+          <a href="https://drive.google.com/file/d/1w-mBLCxPfkdu0FY-jjPGJS2k1snNdxV8/view?usp=drive_open" target="_blank" rel="noopener noreferrer" class="flex items-center gap-4 bg-white/5 rounded-xl p-4 border border-white/5 active:scale-[0.98] transition">
+            <div class="w-12 h-12 rounded-xl bg-sky-500/20 flex items-center justify-center shrink-0"><i data-lucide="play-circle" class="w-5 h-5 text-sky-400"></i></div>
+            <div class="flex-1"><span class="font-700 text-sm">Com instal·lar l'app de la RGL (Windows)</span></div>
+            <i data-lucide="arrow-up-right" class="w-4 h-4 text-gray-500 shrink-0"></i>
+          </a>
+          <a href="https://drive.google.com/file/d/1quE_jkmaEJoLVSjj-GwIoHHUr5k5ltAY/view" target="_blank" rel="noopener noreferrer" class="flex items-center gap-4 bg-white/5 rounded-xl p-4 border border-white/5 active:scale-[0.98] transition">
+            <div class="w-12 h-12 rounded-xl bg-sky-500/20 flex items-center justify-center shrink-0"><i data-lucide="play-circle" class="w-5 h-5 text-sky-400"></i></div>
+            <div class="flex-1"><span class="font-700 text-sm">Com accedir a la RGL PLUS</span></div>
+            <i data-lucide="arrow-up-right" class="w-4 h-4 text-gray-500 shrink-0"></i>
+          </a>
+          <a href="https://drive.google.com/file/d/1TKHHMhJPSnWIRHgILHIJjdrSPDlYmLbq/view" target="_blank" rel="noopener noreferrer" class="flex items-center gap-4 bg-white/5 rounded-xl p-4 border border-white/5 active:scale-[0.98] transition">
+            <div class="w-12 h-12 rounded-xl bg-sky-500/20 flex items-center justify-center shrink-0"><i data-lucide="play-circle" class="w-5 h-5 text-sky-400"></i></div>
+            <div class="flex-1"><span class="font-700 text-sm">Com utilitzar la pàgina web</span></div>
+            <i data-lucide="arrow-up-right" class="w-4 h-4 text-gray-500 shrink-0"></i>
+          </a>
+          <a href="https://drive.google.com/file/d/1uss3Zde65Hpri1ByYCq7wwW3JOlOnjgf/view" target="_blank" rel="noopener noreferrer" class="flex items-center gap-4 bg-white/5 rounded-xl p-4 border border-white/5 active:scale-[0.98] transition">
+            <div class="w-12 h-12 rounded-xl bg-sky-500/20 flex items-center justify-center shrink-0"><i data-lucide="play-circle" class="w-5 h-5 text-sky-400"></i></div>
+            <div class="flex-1"><span class="font-700 text-sm">Errors i dubtes d'inici de sessió</span></div>
+            <i data-lucide="arrow-up-right" class="w-4 h-4 text-gray-500 shrink-0"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- MES > SUPORT > FAQ SUBPAGE -->
+    <div class="page" id="page-mes-suport-faq">
+      <div class="flex-1 overflow-y-auto">
+        <div class="section-hero h-48 bg-gradient-to-br from-sky-600 to-sky-900 flex flex-col justify-end p-5">
+          <div class="section-hero-content">
+            <button onclick="openMesSub('suport')" class="mb-3 w-9 h-9 rounded-full bg-black/30 flex items-center justify-center backdrop-blur-sm"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
+            <h1 class="text-3xl font-900 text-white">❔ Preguntes freqüents</h1>
+            <p class="text-sm text-white/70 mt-1">Respostes a dubtes comuns</p>
+          </div>
+        </div>
+        <div class="p-5 space-y-2" id="faq-list">
+          <div class="faq-item bg-white/5 rounded-xl border border-white/5 overflow-hidden">
+            <button onclick="toggleFaq(this)" class="w-full flex items-center gap-3 p-4 text-left">
+              <span class="flex-1 font-700 text-sm">1. Què és aquesta ràdio en línia?</span>
+              <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-gray-500 shrink-0 transition-transform"></i>
+            </button>
+            <div class="faq-answer hidden px-4 pb-4"><p class="text-sm opacity-80 leading-relaxed">Som una emissora digital que ofereix música, entreteniment i programes variats en català perquè ens puguis escoltar des de qualsevol lloc del món.</p></div>
+          </div>
+          <div class="faq-item bg-white/5 rounded-xl border border-white/5 overflow-hidden">
+            <button onclick="toggleFaq(this)" class="w-full flex items-center gap-3 p-4 text-left">
+              <span class="flex-1 font-700 text-sm">2. Com puc escoltar la ràdio?</span>
+              <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-gray-500 shrink-0 transition-transform"></i>
+            </button>
+            <div class="faq-answer hidden px-4 pb-4"><p class="text-sm opacity-80 leading-relaxed">Primer, t'has d'assegurar que tens accés a la ràdio. Si estàs segur de tenir-hi accés, només has d'accedir al nostre lloc web o a l'aplicació i gaudir dels continguts.</p></div>
+          </div>
+          <div class="faq-item bg-white/5 rounded-xl border border-white/5 overflow-hidden">
+            <button onclick="toggleFaq(this)" class="w-full flex items-center gap-3 p-4 text-left">
+              <span class="flex-1 font-700 text-sm">3. És gratuït escoltar la ràdio?</span>
+              <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-gray-500 shrink-0 transition-transform"></i>
+            </button>
+            <div class="faq-answer hidden px-4 pb-4"><p class="text-sm opacity-80 leading-relaxed">Sí, l'emissió normal és gratuïta i accessible des de qualsevol dispositiu amb connexió a Internet, tot i que també els pots descarregar per reproduir-los sense connexió.</p></div>
+          </div>
+          <div class="faq-item bg-white/5 rounded-xl border border-white/5 overflow-hidden">
+            <button onclick="toggleFaq(this)" class="w-full flex items-center gap-3 p-4 text-left">
+              <span class="flex-1 font-700 text-sm">4. Puc escoltar la ràdio des del mòbil?</span>
+              <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-gray-500 shrink-0 transition-transform"></i>
+            </button>
+            <div class="faq-answer hidden px-4 pb-4"><p class="text-sm opacity-80 leading-relaxed">Sí. Pots escoltar-nos des de qualsevol telèfon intel·ligent, tauleta o ordinador.</p></div>
+          </div>
+          <div class="faq-item bg-white/5 rounded-xl border border-white/5 overflow-hidden">
+            <button onclick="toggleFaq(this)" class="w-full flex items-center gap-3 p-4 text-left">
+              <span class="flex-1 font-700 text-sm">5. Quin tipus de música emeteu?</span>
+              <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-gray-500 shrink-0 transition-transform"></i>
+            </button>
+            <div class="faq-answer hidden px-4 pb-4"><p class="text-sm opacity-80 leading-relaxed">Oferim una selecció variada de música, així com programes d'entreteniment, entrevistes i espais especials.</p></div>
+          </div>
+          <div class="faq-item bg-white/5 rounded-xl border border-white/5 overflow-hidden">
+            <button onclick="toggleFaq(this)" class="w-full flex items-center gap-3 p-4 text-left">
+              <span class="flex-1 font-700 text-sm">6. Puc demanar una cançó?</span>
+              <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-gray-500 shrink-0 transition-transform"></i>
+            </button>
+            <div class="faq-answer hidden px-4 pb-4"><p class="text-sm opacity-80 leading-relaxed">Sí. Pots enviar les teves peticions a través del formulari a l'apartat de "música".</p></div>
+          </div>
+          <div class="faq-item bg-white/5 rounded-xl border border-white/5 overflow-hidden">
+            <button onclick="toggleFaq(this)" class="w-full flex items-center gap-3 p-4 text-left">
+              <span class="flex-1 font-700 text-sm">7. Com puc contactar amb la ràdio?</span>
+              <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-gray-500 shrink-0 transition-transform"></i>
+            </button>
+            <div class="faq-answer hidden px-4 pb-4"><p class="text-sm opacity-80 leading-relaxed">Ens pots escriure per correu electrònic a <a href="mailto:radiogl.coll@gmail.com" class="text-sky-400 font-700">radiogl.coll@gmail.com</a></p></div>
+          </div>
+          <div class="faq-item bg-white/5 rounded-xl border border-white/5 overflow-hidden">
+            <button onclick="toggleFaq(this)" class="w-full flex items-center gap-3 p-4 text-left">
+              <span class="flex-1 font-700 text-sm">8. Feu programes en directe?</span>
+              <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-gray-500 shrink-0 transition-transform"></i>
+            </button>
+            <div class="faq-answer hidden px-4 pb-4"><p class="text-sm opacity-80 leading-relaxed">Sí. Disposem de programes en directe i també d'espais pòdcast que es poden tornar a escoltar.</p></div>
+          </div>
+          <div class="faq-item bg-white/5 rounded-xl border border-white/5 overflow-hidden">
+            <button onclick="toggleFaq(this)" class="w-full flex items-center gap-3 p-4 text-left">
+              <span class="flex-1 font-700 text-sm">9. Puc anunciar el meu negoci a la ràdio?</span>
+              <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-gray-500 shrink-0 transition-transform"></i>
+            </button>
+            <div class="faq-answer hidden px-4 pb-4"><p class="text-sm opacity-80 leading-relaxed">Sí. Oferim diferents opcions de publicitat i patrocinis. Contacta amb nosaltres per rebre més informació.</p></div>
+          </div>
+          <div class="faq-item bg-white/5 rounded-xl border border-white/5 overflow-hidden">
+            <button onclick="toggleFaq(this)" class="w-full flex items-center gap-3 p-4 text-left">
+              <span class="flex-1 font-700 text-sm">10. Com puc col·laborar amb la ràdio?</span>
+              <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-gray-500 shrink-0 transition-transform"></i>
+            </button>
+            <div class="faq-answer hidden px-4 pb-4"><p class="text-sm opacity-80 leading-relaxed">Si vols presentar un programa, que t'entrevistin, participar com a col·laborador o proposar un projecte, posa't en contacte amb nosaltres. Estarem encantats de valorar la teva proposta.</p></div>
+          </div>
+          <div class="faq-item bg-white/5 rounded-xl border border-white/5 overflow-hidden">
+            <button onclick="toggleFaq(this)" class="w-full flex items-center gap-3 p-4 text-left">
+              <span class="flex-1 font-700 text-sm">11. Les emissions estan disponibles les 24 hores?</span>
+              <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-gray-500 shrink-0 transition-transform"></i>
+            </button>
+            <div class="faq-answer hidden px-4 pb-4"><p class="text-sm opacity-80 leading-relaxed">Sí, la nostra emissió està disponible les 24 hores del dia, els 7 dies de la setmana, excepte en casos de manteniment tècnic.</p></div>
+          </div>
+          <div class="faq-item bg-white/5 rounded-xl border border-white/5 overflow-hidden">
+            <button onclick="toggleFaq(this)" class="w-full flex items-center gap-3 p-4 text-left">
+              <span class="flex-1 font-700 text-sm">12. On puc seguir les novetats?</span>
+              <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-gray-500 shrink-0 transition-transform"></i>
+            </button>
+            <div class="faq-answer hidden px-4 pb-4"><p class="text-sm opacity-80 leading-relaxed">Uneix-te al nostre grup de WhatsApp, on només nosaltres podem escriure, i visita el nostre web per estar al dia de la programació, les novetats i els esdeveniments.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MES > COMUNICACIO SUBPAGE -->
+    <div class="page" id="page-mes-comunicacio">
+      <div class="flex-1 overflow-y-auto">
+        <div class="section-hero h-48 bg-gradient-to-br from-emerald-600 to-emerald-900 flex flex-col justify-end p-5">
+          <div class="section-hero-content">
+            <button onclick="backToMes()" class="mb-3 w-9 h-9 rounded-full bg-black/30 flex items-center justify-center backdrop-blur-sm"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
+            <h1 class="text-3xl font-900 text-white">💬 Comunicació</h1>
+            <p class="text-sm text-white/70 mt-1">Contacta amb nosaltres</p>
+          </div>
+        </div>
+        <div class="p-5 space-y-4">
+          <div class="bg-white/5 rounded-xl p-4 border border-white/5">
+            <p class="text-sm opacity-80 leading-relaxed">Si voleu informar-nos de dubtes, errors... si teniu propostes o recomanacions, si teniu problemes al entrar o el que sigui, ens podeu enviar correus electrònics al nostre correu oficial.</p>
+            <a href="mailto:radiogl.coll@gmail.com" class="mt-3 flex items-center gap-3 bg-emerald-500/10 rounded-lg p-3 border border-emerald-500/20">
+              <i data-lucide="mail" class="w-5 h-5 text-emerald-400 shrink-0"></i>
+              <span class="text-sm font-700 text-emerald-500">radiogl.coll@gmail.com</span>
+            </a>
+          </div>
+          <div class="bg-white/5 rounded-xl p-4 border border-white/5">
+            <p class="text-sm opacity-80 leading-relaxed">Si voleu ser el primer a estar al corrent de les novetats de la ràdio, us podeu unir a aquest grup informatiu, on només nosaltres podem enviar missatges. Us podeu unir contactant-nos o des d'aquest enllaç.</p>
+            <a href="https://chat.whatsapp.com/ErUhgPnUO9qIgFAkwQWjbq?mode=gi_t" target="_blank" rel="noopener" class="mt-3 flex items-center gap-3 bg-emerald-500/10 rounded-lg p-3 border border-emerald-500/20">
+              <i data-lucide="message-circle" class="w-5 h-5 text-emerald-400 shrink-0"></i>
+              <span class="text-sm font-700 text-emerald-500">Unir-me al grup de WhatsApp</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MES > DONATIUS SUBPAGE -->
+    <div class="page" id="page-mes-donatius">
+      <div class="flex-1 overflow-y-auto">
+        <div class="section-hero h-48 bg-gradient-to-br from-amber-600 to-amber-900 flex flex-col justify-end p-5">
+          <div class="section-hero-content">
+            <button onclick="backToMes()" class="mb-3 w-9 h-9 rounded-full bg-black/30 flex items-center justify-center backdrop-blur-sm"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
+            <h1 class="text-3xl font-900 text-white">🤍 Donatius</h1>
+            <p class="text-sm text-white/70 mt-1">Ajuda a la Ràdio GL</p>
+          </div>
+        </div>
+        <div class="p-5 space-y-4">
+          <div class="bg-white/5 rounded-xl p-4 border border-white/5">
+            <h2 class="font-800 text-base mb-1">Dona suport a Ràdio GL</h2>
+            <p class="text-sm opacity-80 leading-relaxed">Si t'agrada el nostre projecte i vols ajudar-nos a continuar creixent, pots fer una donació. Gràcies per formar part de la nostra comunitat!</p>
+          </div>
+
+          <div class="bg-amber-500/10 rounded-xl p-4 border border-amber-500/20">
+            <h3 class="font-700 text-sm mb-2 text-amber-600">ℹ️ Abans de donar, llegeix això</h3>
+            <ul class="text-xs opacity-80 leading-relaxed space-y-2 list-disc pl-4">
+              <li>Les donacions són totalment voluntàries. Ningú està obligat a fer-ne cap.</li>
+              <li>Fer una donació no dona cap avantatge, privilegi ni accés especial respecte a la resta d'usuaris.</li>
+              <li>Tot el contingut de Ràdio GL continuarà sent completament gratuït, tant si decideixes donar com si no.</li>
+              <li>Només dona si realment t'ho pots permetre. El teu benestar sempre és més important.</li>
+              <li>Agraïm enormement el vostre suport, confiança i estima. Sense vosaltres aquest projecte no seria possible.</li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 class="text-xs font-700 uppercase tracking-widest text-gray-500 mb-3">📻 A què destinarem les donacions?</h3>
+            <div class="space-y-2">
+              <div class="flex items-center gap-4 bg-white/5 rounded-xl p-3 border border-white/5">
+                <div class="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center shrink-0 text-lg">🌐</div>
+                <div class="flex-1"><span class="font-700 text-sm">Manteniment de la web</span><p class="text-xs text-gray-500 mt-0.5">Hosting, domini, rendiment i millores tècniques</p></div>
+              </div>
+              <div class="flex items-center gap-4 bg-white/5 rounded-xl p-3 border border-white/5">
+                <div class="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center shrink-0 text-lg">✨</div>
+                <div class="flex-1"><span class="font-700 text-sm">Noves funcionalitats</span><p class="text-xs text-gray-500 mt-0.5">Desenvolupar nous sistemes i eines per a tota la comunitat</p></div>
+              </div>
+              <div class="flex items-center gap-4 bg-white/5 rounded-xl p-3 border border-white/5">
+                <div class="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center shrink-0 text-lg">💳</div>
+                <div class="flex-1"><span class="font-700 text-sm">Eines i serveis</span><p class="text-xs text-gray-500 mt-0.5">Plataformes i serveis que ajudin a fer créixer el projecte</p></div>
+              </div>
+              <div class="flex items-center gap-4 bg-white/5 rounded-xl p-3 border border-white/5">
+                <div class="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center shrink-0 text-lg">😊</div>
+                <div class="flex-1"><span class="font-700 text-sm">Millor experiència</span><p class="text-xs text-gray-500 mt-0.5">Una web més ràpida, còmoda i agradable per a tothom</p></div>
+              </div>
+              <div class="flex items-center gap-4 bg-white/5 rounded-xl p-3 border border-white/5">
+                <div class="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center shrink-0 text-lg">❤️</div>
+                <div class="flex-1"><span class="font-700 text-sm">I molt més...</span><p class="text-xs text-gray-500 mt-0.5">Qualsevol millora per oferir un millor servei als oients</p></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white/5 rounded-xl p-4 border border-white/5">
+            <h3 class="font-700 text-sm mb-2">💙 Com pots fer la teva donació?</h3>
+            <p class="text-sm opacity-80 leading-relaxed">Per donar, només ens has de fer arribar un correu i trobarem un moment perquè ens puguis passar la donació en efectiu.</p>
+            <a href="mailto:radiogl.coll@gmail.com" class="mt-3 flex items-center gap-3 bg-amber-500/10 rounded-lg p-3 border border-amber-500/20">
+              <i data-lucide="mail" class="w-5 h-5 text-amber-500 shrink-0"></i>
+              <span class="text-sm font-700 text-amber-600">radiogl.coll@gmail.com</span>
+            </a>
+            <p class="text-sm opacity-80 leading-relaxed mt-3">Moltes gràcies pel teu suport!<br>L'equip de la Ràdio GL</p>
+          </div>
+
+          <p class="text-xs text-gray-500 text-center leading-relaxed px-2">Gràcies de tot cor per formar part de Ràdio GL, amb donació o sense. El vostre suport diari és el que fa possible aquest projecte. 💙</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <nav class="shrink-0 bg-[#0a0a0a] border-t border-white/5 px-1 pb-1 pt-2">
+      <div class="flex justify-around">
+        <button onclick="goHome()" class="bottom-nav-item active-nav flex flex-col items-center gap-0.5 py-1 px-1" id="nav-home">
+          <i data-lucide="home" class="w-5 h-5"></i><span class="text-[8px] font-600">Inici</span>
+          <div class="nav-dot w-1 h-1 rounded-full bg-[#ff6b35]"></div>
+        </button>
+        <button onclick="openSection('musica')" class="bottom-nav-item text-gray-600 flex flex-col items-center gap-0.5 py-1 px-1" id="nav-musica">
+          <i data-lucide="music" class="w-5 h-5"></i><span class="text-[8px] font-600">Música</span>
+          <div class="nav-dot w-1 h-1 rounded-full bg-[#ff6b35]"></div>
+        </button>
+        <button onclick="openSection('entrevistes')" class="bottom-nav-item text-gray-600 flex flex-col items-center gap-0.5 py-1 px-1" id="nav-entrevistes">
+          <i data-lucide="mic" class="w-5 h-5"></i><span class="text-[8px] font-600">Entrev.</span>
+          <div class="nav-dot w-1 h-1 rounded-full bg-[#ff6b35]"></div>
+        </button>
+        <button onclick="openSection('resenyes')" class="bottom-nav-item text-gray-600 flex flex-col items-center gap-0.5 py-1 px-1" id="nav-resenyes">
+          <i data-lucide="book-open" class="w-5 h-5"></i><span class="text-[8px] font-600">Resenyes</span>
+          <div class="nav-dot w-1 h-1 rounded-full bg-[#ff6b35]"></div>
+        </button>
+        <button onclick="openSection('especials')" class="bottom-nav-item text-gray-600 flex flex-col items-center gap-0.5 py-1 px-1" id="nav-especials">
+          <i data-lucide="star" class="w-5 h-5"></i><span class="text-[8px] font-600">Report.</span>
+          <div class="nav-dot w-1 h-1 rounded-full bg-[#ff6b35]"></div>
+        </button>
+        <button onclick="openSection('acudits')" class="bottom-nav-item text-gray-600 flex flex-col items-center gap-0.5 py-1 px-1" id="nav-acudits">
+          <i data-lucide="laugh" class="w-5 h-5"></i><span class="text-[8px] font-600">Acudits</span>
+          <div class="nav-dot w-1 h-1 rounded-full bg-[#ff6b35]"></div>
+        </button>
+        <button onclick="openSection('kids')" class="bottom-nav-item text-gray-600 flex flex-col items-center gap-0.5 py-1 px-1" id="nav-kids">
+          <i data-lucide="smile" class="w-5 h-5"></i><span class="text-[8px] font-600">Kids</span>
+          <div class="nav-dot w-1 h-1 rounded-full bg-[#ff6b35]"></div>
+        </button>
+        <button onclick="openSection('rglplus')" class="bottom-nav-item text-gray-600 flex flex-col items-center gap-0.5 py-1 px-1" id="nav-rglplus">
+          <i data-lucide="crown" class="w-5 h-5"></i><span class="text-[8px] font-600">Plus</span>
+          <div class="nav-dot w-1 h-1 rounded-full bg-violet-400"></div>
+        </button>
+        <button onclick="openSection('mes')" class="bottom-nav-item text-gray-600 flex flex-col items-center gap-0.5 py-1 px-1" id="nav-mes">
+          <i data-lucide="more-horizontal" class="w-5 h-5"></i><span class="text-[8px] font-600">Més</span>
+          <div class="nav-dot w-1 h-1 rounded-full bg-[#ff6b35]"></div>
+        </button>
+      </div>
+    </nav>
+  </div>
+
+  <script>
+    const defaultConfig = {
+      slogan: 'Estrena el teu dia amb la Ràdio GL',
+      primary_color: '#ff6b35',
+      surface_color: '#111111',
+      text_color: '#ffffff',
+      nav_bg_color: '#0a0a0a',
+      accent_secondary: '#10b981',
+      font_family: 'Outfit',
+      font_size: 16
+    };
+
+    // KIDS POPUP
+    let kidsPopupCallback = null;
+    const popupThemes = {
+      win:   { bg: 'linear-gradient(135deg,#fbbf24,#f59e0b)', color: '#7c2d00', btn: '#7c2d00', btnColor: '#fef3c7' },
+      lose:  { bg: 'linear-gradient(135deg,#f87171,#ef4444)', color: '#fff', btn: '#fff', btnColor: '#ef4444' },
+      info:  { bg: 'linear-gradient(135deg,#818cf8,#6366f1)', color: '#fff', btn: '#fff', btnColor: '#4338ca' },
+      next:  { bg: 'linear-gradient(135deg,#34d399,#10b981)', color: '#fff', btn: '#fff', btnColor: '#065f46' },
+    };
+
+    function kidsPopup(type, emoji, title, msg, cb) {
+      const t = popupThemes[type] || popupThemes.info;
+      const box = document.getElementById('kids-popup-box');
+      box.style.background = t.bg;
+      document.getElementById('kids-popup-emoji').textContent = emoji;
+      document.getElementById('kids-popup-title').style.color = t.color;
+      document.getElementById('kids-popup-title').textContent = title;
+      document.getElementById('kids-popup-msg').style.color = t.color;
+      document.getElementById('kids-popup-msg').textContent = msg;
+      const btn = document.getElementById('kids-popup-btn');
+      btn.style.background = t.btn;
+      btn.style.color = t.btnColor;
+      // re-trigger animation
+      box.style.animation = 'none';
+      box.offsetHeight;
+      box.style.animation = '';
+      document.getElementById('kids-popup-overlay').classList.add('show');
+      kidsPopupCallback = cb || null;
+    }
+
+    function kidsPopupClose() {
+      document.getElementById('kids-popup-overlay').classList.remove('show');
+      if (kidsPopupCallback) { kidsPopupCallback(); kidsPopupCallback = null; }
+    }
+    const RGL_PASS = 'RGL08';
+    let rglUnlocked = false;
+
+    // NAVIGATION
+    function openSection(name) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-' + name).classList.add('active');
+      document.querySelectorAll('.bottom-nav-item').forEach(b => {
+        b.classList.remove('active-nav');
+        b.classList.add('text-gray-600');
+      });
+      const navBtn = document.getElementById('nav-' + name);
+      if (navBtn) { navBtn.classList.add('active-nav'); navBtn.classList.remove('text-gray-600'); }
+      // RGL Plus: reset a locked si no s'ha desbloquejat
+      if (name === 'rglplus' && !rglUnlocked) {
+        document.getElementById('rglplus-locked').classList.remove('hidden');
+        document.getElementById('rglplus-unlocked').classList.add('hidden');
+        document.getElementById('rglplus-error').classList.add('hidden');
+        document.getElementById('rglplus-input').value = '';
+      }
+      lucide.createIcons();
+    }
+
+    function goHome() {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-home').classList.add('active');
+      document.querySelectorAll('.bottom-nav-item').forEach(b => {
+        b.classList.remove('active-nav');
+        b.classList.add('text-gray-600');
+      });
+      document.getElementById('nav-home').classList.add('active-nav');
+      document.getElementById('nav-home').classList.remove('text-gray-600');
+      lucide.createIcons();
+    }
+
+    function openMesSub(name) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-mes-' + name).classList.add('active');
+      lucide.createIcons();
+    }
+
+    function toggleFaq(btn) {
+      const item = btn.closest('.faq-item');
+      const answer = item.querySelector('.faq-answer');
+      const chevron = item.querySelector('.faq-chevron');
+      const isOpen = !answer.classList.contains('hidden');
+      answer.classList.toggle('hidden');
+      chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+    }
+
+    function openSubsPopup() {
+      document.getElementById('subs-overlay').style.display = 'flex';
+      lucide.createIcons();
+    }
+
+    function backToMes() {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-mes').classList.add('active');
+      lucide.createIcons();
+    }
+
+    function openKidsGame() {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-kids-games').classList.add('active');
+      lucide.createIcons();
+    }
+
+    function backToKids() {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-kids').classList.add('active');
+      lucide.createIcons();
+    }
+
+    // KIDS MIRAR (Netflix-style series + movies)
+    const kidsSeries = [
+      { title: "El Xai Shaun", cover: "Hzxkplv6sdM", episodes: ["Hzxkplv6sdM", "DKOJGBlo0W4", "4PspiCg8DdI"] },
+      { title: "Grizzly i els Lemmings", cover: "DoYNyKn1pNk", episodes: ["DoYNyKn1pNk", "dzDIt_RiqPc", "CPGRKGLwzQo"] },
+      { title: "Les Tres Bessones", cover: "aRedjK0yAME", episodes: ["aRedjK0yAME", "NoZ0A4oiguQ", "RliwAjIyP7o"] },
+      { title: "La Pantera Rosa", cover: "30MWO8kVOYc", episodes: ["30MWO8kVOYc", "Z0nk50iX2Bc", "QEkRmJfBWWc"] },
+      { title: "Robocar Poli", cover: "U6b6EZSR2Kc", episodes: ["U6b6EZSR2Kc", "38br0-1I7ho", "YbwPiVPBskI"] },
+      { title: "Una Mà de Contes", cover: "UuVP4hqcuUI", episodes: ["UuVP4hqcuUI", "EJO7fJpdCy8", "DyyQQa8TEak"] },
+      { title: "Tom i Jerry", cover: "nm5TZ6bvS94", episodes: ["nm5TZ6bvS94", "j-88jrkyszQ", "EJvXNPT4uD0"] },
+      { title: "Mic", cover: "d3PgntUmw8I", episodes: ["d3PgntUmw8I", "beduIZKqlGU", "wYMX5Q15QWA"] },
+      { title: "Els Barrufets", cover: "W-TeDol8wVU", episodes: ["W-TeDol8wVU", "uzD9MukVDOk", "3ScfXyNcJak"] },
+      { title: "PJ Masks", cover: "py9uGDARQgY", episodes: ["py9uGDARQgY", "ma1ydCMJjRQ", "HSW7LoO0fmE"] },
+      { title: "Doraemon", cover: "RBZTzGidfKU", episodes: ["RBZTzGidfKU", "Fw0WMcbPJPo", "fInVnrvEh5A"] },
+      { title: "Pepa la Porqueta", cover: "NXGT7pQ5GmU", episodes: ["NXGT7pQ5GmU", "C3pifNtvHEI", "rEVGdK0n4a4"] }
+    ];
+
+    const kidsMovies = [
+      { title: "Toy Story 3", embed: "https://ok.ru/videoembed/7683440118319?nochat=1" },
+      { title: "Shrek 3", embed: "https://ok.ru/videoembed/9835566533131?nochat=1" },
+      { title: "Gru, mi villano favorito", embed: "https://ok.ru/videoembed/7717345823279?nochat=1" }
+    ];
+
+    let mirarActiveTab = 'series';
+    let kidsPlayerReturnTo = 'page-kids-mirar';
+
+    function switchMirarTab(tab) {
+      mirarActiveTab = tab;
+      const tabSeries = document.getElementById('mirar-tab-series');
+      const tabMovies = document.getElementById('mirar-tab-movies');
+      if (tab === 'series') {
+        tabSeries.className = 'flex-1 py-2.5 rounded-xl font-700 text-sm bg-white text-black transition';
+        tabMovies.className = 'flex-1 py-2.5 rounded-xl font-700 text-sm bg-white/10 text-white transition';
+      } else {
+        tabMovies.className = 'flex-1 py-2.5 rounded-xl font-700 text-sm bg-white text-black transition';
+        tabSeries.className = 'flex-1 py-2.5 rounded-xl font-700 text-sm bg-white/10 text-white transition';
+      }
+      renderMirarGrid();
+    }
+
+    function renderMirarGrid() {
+      const row = document.getElementById('mirar-row');
+      if (mirarActiveTab === 'series') {
+        row.innerHTML = kidsSeries.map((s, idx) => `
+          <button onclick="openSeriesEpisodes(${idx})" class="text-left active:scale-95 transition">
+            <div class="w-full aspect-video rounded-xl overflow-hidden bg-white/10 border border-white/10 relative">
+              <img src="https://img.youtube.com/vi/${s.cover}/hqdefault.jpg" class="w-full h-full object-cover" loading="lazy">
+              <div class="absolute inset-0 flex items-center justify-center bg-black/20">
+                <div class="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center"><i data-lucide="play" class="w-4 h-4 text-black ml-0.5"></i></div>
+              </div>
+            </div>
+            <p class="text-xs font-700 mt-1.5 leading-tight">${s.title}</p>
+          </button>
+        `).join('');
+      } else {
+        row.innerHTML = kidsMovies.map(m => `
+          <button onclick="playKidsMovie('${m.embed}', '${m.title.replace(/'/g, "\\'")}')" class="text-left active:scale-95 transition">
+            <div class="w-full aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-indigo-500 to-purple-600 border border-white/10 relative flex items-center justify-center">
+              <span class="text-3xl">🎬</span>
+              <div class="absolute inset-0 flex items-center justify-center bg-black/20">
+                <div class="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center"><i data-lucide="play" class="w-4 h-4 text-black ml-0.5"></i></div>
+              </div>
+            </div>
+            <p class="text-xs font-700 mt-1.5 leading-tight">${m.title}</p>
+          </button>
+        `).join('');
+      }
+      lucide.createIcons();
+    }
+
+    function openKidsMirar() {
+      renderMirarGrid();
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-kids-mirar').classList.add('active');
+      lucide.createIcons();
+    }
+
+    function openSeriesEpisodes(idx) {
+      const s = kidsSeries[idx];
+      document.getElementById('episodes-title').textContent = s.title;
+      const list = document.getElementById('episodes-list');
+      list.innerHTML = s.episodes.map((epId, i) => `
+        <button onclick="playKidsVideo('${epId}', '${s.title.replace(/'/g, "\\'")} - Capítol ${i + 1}')" class="w-full flex items-center gap-4 bg-white/5 rounded-xl p-3 border border-white/5 active:scale-[0.98] transition">
+          <div class="w-24 h-14 rounded-lg overflow-hidden bg-white/10 shrink-0 relative">
+            <img src="https://img.youtube.com/vi/${epId}/hqdefault.jpg" class="w-full h-full object-cover" loading="lazy">
+          </div>
+          <div class="flex-1 text-left"><span class="font-700 text-sm">Capítol ${i + 1}</span></div>
+          <i data-lucide="play" class="w-4 h-4 text-gray-400 shrink-0"></i>
+        </button>
+      `).join('');
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-kids-episodes').classList.add('active');
+      lucide.createIcons();
+    }
+
+    function playKidsVideo(id, title) {
+      kidsPlayerReturnTo = 'page-kids-episodes';
+      document.getElementById('kids-player-iframe').src = 'https://www.youtube.com/embed/' + id + '?autoplay=1&rel=0';
+      document.getElementById('kids-player-title').textContent = title;
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-kids-player').classList.add('active');
+      lucide.createIcons();
+    }
+
+    function playKidsMovie(embedUrl, title) {
+      kidsPlayerReturnTo = 'page-kids-mirar';
+      document.getElementById('kids-player-iframe').src = embedUrl;
+      document.getElementById('kids-player-title').textContent = title;
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-kids-player').classList.add('active');
+      lucide.createIcons();
+    }
+
+    function stopKidsPlayer() {
+      document.getElementById('kids-player-iframe').src = '';
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(kidsPlayerReturnTo).classList.add('active');
+      lucide.createIcons();
+    }
+
+    function backToKidsGames() {
+      stopSerp();
+      stopTopaMoles();
+      stopPong();
+      stopLaberint();
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-kids-games').classList.add('active');
+      lucide.createIcons();
+    }
+
+    function startGame(gameName) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-game-' + gameName).classList.add('active');
+      lucide.createIcons();
+      if (gameName === 'memori') initMemori();
+      if (gameName === 'colors') initColors();
+      if (gameName === 'numeros') initNumeros();
+      if (gameName === 'comptar') initComptar();
+      if (gameName === 'serp') initSerp();
+      if (gameName === 'laberint') { labLevel = 1; initLaberint(); }
+      if (gameName === 'abecedari') initAbecedari();
+      if (gameName === 'topamoles') initTopaMoles();
+      if (gameName === 'pong') initPongMenu();
+    }
+
+    // ACUDITS - Jokes in Catalan
+    const acudits = [
+      { setup: "Per què els elefants no utilitzen ordinadors?", punchline: "Perquè li tenen por al ratolí! 🐭" },
+      { setup: "Que li diu un semàfor a l'altre?", punchline: "No em miris que m'estic canviant! 🚦" },
+      { setup: "Que li diu un peix a l'altre?", punchline: "Nada! 🐟" },
+      { setup: "Per què els esquelets no es barallen?", punchline: "Perquè no tenen fetge! 💀" },
+      { setup: "Que li diu una vela a l'altra vela?", punchline: "Anem a dormir, que ja és hora d'apagar-nos! 🕯️" },
+      { setup: "Per què el llibre de matemàtiques estava trist?", punchline: "Perquè tenia molts problemes! 📚" },
+      { setup: "Que li diu un cargol a l'altra?", punchline: "Anem ràpid, que portem pressa! 🐌" },
+      { setup: "Com s'anomenen els policies que vigilen el McDonald's?", punchline: "La guàrdia hamburgesa! 🍔" },
+      { setup: "Que li diu el zero al vuit?", punchline: "Molt bonic el cinturó que portes! ⭕" },
+      { setup: "Per què la granota va a la biblioteca?", punchline: "Per demanar llibres de cuina! 🐸" },
+      { setup: "Que li diu un gra de sorra a l'altre?", punchline: "Avui hi ha molta gent a la platja! 🏖️" },
+      { setup: "Per què la tomata va vermella?", punchline: "Perquè va veure a l'amanida despullada! 🍅" }
+    ];
+
+    let currentJoke = null;
+    let punchlineVisible = false;
+
+    function loadJoke() {
+      const btn = document.getElementById('joke-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="joke-spinner">😂</span> Carregant...';
+
+      setTimeout(() => {
+        currentJoke = acudits[Math.floor(Math.random() * acudits.length)];
+        punchlineVisible = false;
+
+        document.getElementById('joke-setup').textContent = currentJoke.setup;
+        const punchEl = document.getElementById('joke-punchline');
+        punchEl.textContent = currentJoke.punchline;
+        punchEl.classList.add('hidden');
+
+        document.getElementById('joke-reveal-btn').classList.remove('hidden');
+
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="refresh-cw" class="w-5 h-5"></i> Nou acudit!';
+        lucide.createIcons();
+      }, 600);
+    }
+
+    function revealPunchline() {
+      document.getElementById('joke-punchline').classList.remove('hidden');
+      document.getElementById('joke-reveal-btn').classList.add('hidden');
+    }
+
+    // MEMORI GAME
+    let memoriCards = [];
+    let memoriFlipped = [];
+    let memoriMatched = 0;
+    let memoriLocked = false;
+    const emojis = ['🍎','🍌','🍓','🍊','🍇','🍉','🍋','🍑'];
+
+    function initMemori() {
+      memoriCards = [...emojis, ...emojis].sort(() => Math.random() - 0.5);
+      memoriFlipped = [];
+      memoriMatched = 0;
+      memoriLocked = false;
+      const grid = document.getElementById('memori-grid');
+      grid.innerHTML = '';
+      memoriCards.forEach((emoji, idx) => {
+        const card = document.createElement('button');
+        card.className = 'w-20 h-20 bg-gradient-to-br from-pink-500 to-rose-500 rounded-xl flex items-center justify-center text-2xl active:scale-90 transition cursor-pointer border-2 border-white/20';
+        card.dataset.emoji = emoji;
+        card.dataset.idx = idx;
+        card.textContent = '?';
+        card.onclick = () => flipMemoriCard(idx, card);
+        grid.appendChild(card);
+      });
+    }
+
+    function flipMemoriCard(idx, el) {
+      if (memoriLocked) return;
+      if (el.dataset.matched === 'true') return;
+      if (memoriFlipped.length === 1 && memoriFlipped[0].idx === idx) return;
+
+      el.textContent = el.dataset.emoji;
+      el.style.background = 'rgba(255,255,255,0.15)';
+      memoriFlipped.push({ idx, el });
+
+      if (memoriFlipped.length === 2) {
+        memoriLocked = true;
+        const [a, b] = memoriFlipped;
+        if (a.el.dataset.emoji === b.el.dataset.emoji) {
+          // Match!
+          a.el.dataset.matched = 'true';
+          b.el.dataset.matched = 'true';
+          a.el.style.background = 'rgba(16,185,129,0.4)';
+          b.el.style.background = 'rgba(16,185,129,0.4)';
+          memoriMatched += 2;
+          memoriFlipped = [];
+          memoriLocked = false;
+          if (memoriMatched === memoriCards.length) {
+            setTimeout(() => { kidsPopup('win','🎉','Felicitats!','Has trobat totes les parelles!', initMemori); }, 300);
+          }
+        } else {
+          // No match - flip back
+          setTimeout(() => {
+            a.el.textContent = '?';
+            b.el.textContent = '?';
+            a.el.style.background = '';
+            b.el.style.background = '';
+            memoriFlipped = [];
+            memoriLocked = false;
+          }, 1000);
+        }
+      }
+    }
+
+    // COLORS GAME
+    const colorPairs = [
+      { hex: '#ff6b35', name: 'taronja' },
+      { hex: '#10b981', name: 'verd' },
+      { hex: '#8b5cf6', name: 'púrpura' },
+      { hex: '#3b82f6', name: 'blau' },
+      { hex: '#ec4899', name: 'rosa' },
+      { hex: '#f59e0b', name: 'groc' }
+    ];
+    let colorScore = 0;
+    let targetColorObj = null;
+
+    function initColors() {
+      targetColorObj = colorPairs[Math.floor(Math.random() * colorPairs.length)];
+      document.getElementById('target-color').textContent = targetColorObj.name;
+      document.getElementById('color-score').textContent = 'Puntuació: ' + colorScore;
+      const grid = document.getElementById('colors-grid');
+      grid.innerHTML = '';
+      const shuffled = [...colorPairs].sort(() => Math.random() - 0.5);
+      shuffled.forEach(pair => {
+        const btn = document.createElement('button');
+        btn.className = 'w-24 h-24 rounded-2xl active:scale-90 transition cursor-pointer';
+        btn.style.backgroundColor = pair.hex;
+        btn.onclick = () => checkColor(pair);
+        grid.appendChild(btn);
+      });
+    }
+
+    function checkColor(selected) {
+      if (selected.hex === targetColorObj.hex) {
+        colorScore++;
+        document.getElementById('color-score').textContent = 'Puntuació: ' + colorScore;
+        setTimeout(initColors, 500);
+      } else {
+        colorScore = 0;
+        document.getElementById('color-score').textContent = 'Puntuació: 0';
+        setTimeout(initColors, 800);
+      }
+    }
+
+    // NUMEROS GAME
+    let sequence = [];
+    let playerSequence = [];
+    let numScore = 0;
+
+    function initNumeros() {
+      sequence = [];
+      playerSequence = [];
+      numScore = 0;
+      document.getElementById('numeros-score').textContent = 'Puntuació: 0';
+      const grid = document.getElementById('numeros-grid');
+      grid.innerHTML = '';
+      for (let i = 1; i <= 9; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl font-bold text-xl active:scale-90 transition';
+        btn.textContent = i;
+        btn.onclick = () => playerClickNumero(i);
+        grid.appendChild(btn);
+      }
+      addNumeroSequence();
+    }
+
+    function addNumeroSequence() {
+      sequence.push(Math.floor(Math.random() * 9) + 1);
+      playerSequence = [];
+      playNumeroSequence();
+    }
+
+    function playNumeroSequence() {
+      sequence.forEach((num, idx) => {
+        setTimeout(() => {
+          const btns = document.querySelectorAll('#numeros-grid button');
+          btns[num - 1].style.opacity = '0.5';
+          setTimeout(() => { btns[num - 1].style.opacity = '1'; }, 300);
+        }, idx * 600);
+      });
+    }
+
+    function playerClickNumero(num) {
+      playerSequence.push(num);
+      if (playerSequence[playerSequence.length - 1] !== sequence[playerSequence.length - 1]) {
+        kidsPopup('lose','😢','Ups!','Has fallat! Puntuació: ' + numScore, initNumeros);
+        return;
+      }
+      if (playerSequence.length === sequence.length) {
+        numScore++;
+        document.getElementById('numeros-score').textContent = 'Puntuació: ' + numScore;
+        setTimeout(addNumeroSequence, 1000);
+      }
+    }
+
+    // COMPTAR GAME
+    let comptarScore = 0;
+    let comptarResposta = 0;
+
+    function initComptar() {
+      comptarResposta = Math.floor(Math.random() * 10) + 1;
+      document.getElementById('comptar-score').textContent = 'Puntuació: ' + comptarScore;
+      const items = document.getElementById('comptar-items');
+      items.innerHTML = '';
+      for (let i = 0; i < comptarResposta; i++) {
+        const emoji = ['🍎','🍌','🍓','🍊','🍇'][Math.floor(Math.random() * 5)];
+        items.innerHTML += '<span class="text-4xl">' + emoji + '</span>';
+      }
+      const answers = document.getElementById('comptar-answers');
+      answers.innerHTML = '';
+      const options = [comptarResposta];
+      while (options.length < 3) {
+        const n = Math.floor(Math.random() * 10) + 1;
+        if (!options.includes(n)) options.push(n);
+      }
+      options.sort(() => Math.random() - 0.5);
+      options.forEach(n => {
+        const btn = document.createElement('button');
+        btn.className = 'w-12 h-12 bg-gradient-to-br from-green-500 to-teal-500 rounded-lg font-bold text-lg active:scale-90 transition';
+        btn.textContent = n;
+        btn.onclick = () => {
+          if (n === comptarResposta) {
+            comptarScore++;
+            document.getElementById('comptar-score').textContent = 'Puntuació: ' + comptarScore;
+            setTimeout(initComptar, 500);
+          } else {
+            comptarScore = 0;
+            document.getElementById('comptar-score').textContent = 'Puntuació: 0';
+            setTimeout(initComptar, 1000);
+          }
+        };
+        answers.appendChild(btn);
+      });
+    }
+
+    // LABERINT GAME - grid-based, d-pad controls
+    const LAB_COLS = 11, LAB_ROWS = 11;
+    let labLevel = 1;
+    let labGrid = []; // 0=path, 1=wall
+    let labPlayer = {x:1, y:1};
+    let labGoal = {x: LAB_COLS-2, y: LAB_ROWS-2};
+
+    const labMazes = [
+      // Level 1 - simple
+      [
+        [1,1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,1,0,0,0,0,0,1],
+        [1,0,1,0,1,0,1,1,1,0,1],
+        [1,0,1,0,0,0,1,0,0,0,1],
+        [1,0,1,1,1,1,1,0,1,1,1],
+        [1,0,0,0,0,0,0,0,0,0,1],
+        [1,1,1,0,1,1,1,1,1,0,1],
+        [1,0,0,0,1,0,0,0,1,0,1],
+        [1,0,1,1,1,0,1,0,0,0,1],
+        [1,0,0,0,0,0,1,0,1,0,1],
+        [1,1,1,1,1,1,1,1,1,1,1],
+      ],
+      // Level 2 - medium
+      [
+        [1,1,1,1,1,1,1,1,1,1,1],
+        [1,0,1,0,0,0,1,0,0,0,1],
+        [1,0,1,0,1,0,1,0,1,0,1],
+        [1,0,0,0,1,0,0,0,1,0,1],
+        [1,1,1,1,1,1,1,0,1,0,1],
+        [1,0,0,0,0,0,0,0,1,0,1],
+        [1,0,1,1,1,1,1,1,1,0,1],
+        [1,0,1,0,0,0,0,0,0,0,1],
+        [1,0,1,0,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,0,0,0,0,1],
+        [1,1,1,1,1,1,1,1,1,1,1],
+      ],
+      // Level 3 - harder
+      [
+        [1,1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,0,0,0,0,1],
+        [1,0,1,1,1,1,1,1,1,0,1],
+        [1,0,1,0,0,0,0,0,1,0,1],
+        [1,0,1,0,1,1,1,0,1,0,1],
+        [1,0,1,0,1,0,0,0,1,0,1],
+        [1,0,1,0,1,1,1,1,1,0,1],
+        [1,0,1,0,0,0,0,0,0,0,1],
+        [1,0,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,0,0,0,0,1],
+        [1,1,1,1,1,1,1,1,1,1,1],
+      ],
+    ];
+
+    function initLaberint() {
+      const idx = (labLevel - 1) % labMazes.length;
+      labGrid = labMazes[idx].map(r => [...r]);
+      labPlayer = {x:1, y:1};
+      labGoal = {x: LAB_COLS-2, y: LAB_ROWS-2};
+      document.getElementById('laberint-score').textContent = 'Nivell ' + labLevel;
+      const canvas = document.getElementById('laberint-canvas');
+      if (!canvas) return;
+      const size = Math.min(340, window.innerWidth - 32);
+      canvas.width = size; canvas.height = size;
+      drawLaberint2();
+    }
+
+    function drawLaberint2() {
+      const canvas = document.getElementById('laberint-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const cw = canvas.width, ch = canvas.height;
+      const cellW = cw / LAB_COLS, cellH = ch / LAB_ROWS;
+      ctx.fillStyle = '#0f0f0f';
+      ctx.fillRect(0, 0, cw, ch);
+      for (let r = 0; r < LAB_ROWS; r++) {
+        for (let c = 0; c < LAB_COLS; c++) {
+          if (labGrid[r][c] === 1) {
+            ctx.fillStyle = '#374151';
+            ctx.fillRect(c * cellW, r * cellH, cellW, cellH);
+          }
+        }
+      }
+      // Goal
+      ctx.fillStyle = '#fbbf24';
+      ctx.fillRect(labGoal.x * cellW + 3, labGoal.y * cellH + 3, cellW - 6, cellH - 6);
+      ctx.font = `${Math.floor(cellW * 0.7)}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('🏁', labGoal.x * cellW + cellW/2, labGoal.y * cellH + cellH/2);
+      // Player
+      ctx.fillStyle = '#ff6b35';
+      ctx.beginPath();
+      ctx.arc(labPlayer.x * cellW + cellW/2, labPlayer.y * cellH + cellH/2, Math.min(cellW, cellH)/2 - 3, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    function stopLaberint() { /* nothing async to stop */ }
+
+    function labMove(dir) {
+      let nx = labPlayer.x, ny = labPlayer.y;
+      if (dir === 'up') ny--;
+      if (dir === 'down') ny++;
+      if (dir === 'left') nx--;
+      if (dir === 'right') nx++;
+      if (nx < 0 || ny < 0 || nx >= LAB_COLS || ny >= LAB_ROWS) return;
+      if (labGrid[ny][nx] === 1) return;
+      labPlayer = {x: nx, y: ny};
+      drawLaberint2();
+      if (nx === labGoal.x && ny === labGoal.y) {
+        labLevel++;
+        document.getElementById('laberint-score').textContent = 'Nivell ' + labLevel;
+        setTimeout(() => {
+          if (document.getElementById('page-game-laberint').classList.contains('active')) {
+            kidsPopup('next','🏁','Nivell superat!','Ara el nivell ' + labLevel + '! Endavant!', initLaberint);
+          }
+        }, 100);
+      }
+    }
+
+    // ABECEDARI GAME
+    let abecedariScore = 0;
+    let abecedariTarget = '';
+
+    function initAbecedari() {
+      abecedariScore = 0;
+      document.getElementById('abecedari-score').textContent = 'Puntuació: 0';
+      const lletres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+      abecedariTarget = lletres[Math.floor(Math.random() * lletres.length)];
+      document.getElementById('abecedari-target').textContent = abecedariTarget;
+      const options = document.getElementById('abecedari-options');
+      options.innerHTML = '';
+      const choices = [abecedariTarget];
+      while (choices.length < 3) {
+        const l = lletres[Math.floor(Math.random() * lletres.length)];
+        if (!choices.includes(l)) choices.push(l);
+      }
+      choices.sort(() => Math.random() - 0.5);
+      choices.forEach(l => {
+        const btn = document.createElement('button');
+        btn.className = 'w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl font-900 text-2xl active:scale-90 transition';
+        btn.textContent = l;
+        btn.onclick = () => {
+          if (l === abecedariTarget) {
+            abecedariScore++;
+            document.getElementById('abecedari-score').textContent = 'Puntuació: ' + abecedariScore;
+            initAbecedari();
+          } else {
+            kidsPopup('lose','😬','Oops!','Era la lletra ' + abecedariTarget + '! Torna-ho a intentar!', initAbecedari);
+          }
+        };
+        options.appendChild(btn);
+      });
+    }
+
+    // SERP GAME
+    let snakeGame = {
+      snake: [{x:5,y:5}], food: {x:10,y:10},
+      direction: {x:1,y:0}, nextDirection: {x:1,y:0},
+      gridSize: 20, score: 0, gameRunning: false, gameSpeed: 150, gameLoopId: null
+    };
+
+    function stopSerp() {
+      snakeGame.gameRunning = false;
+      if (snakeGame.gameLoopId) { clearTimeout(snakeGame.gameLoopId); snakeGame.gameLoopId = null; }
+    }
+
+    function initSerp() {
+      stopSerp();
+      snakeGame = {
+        snake: [{x:5,y:5}], food: {x:10,y:10},
+        direction: {x:1,y:0}, nextDirection: {x:1,y:0},
+        gridSize: 20, score: 0, gameRunning: true, gameSpeed: 150, gameLoopId: null
+      };
+      const canvas = document.getElementById('serp-canvas');
+      if (!canvas) return;
+      canvas.width = 320; canvas.height = 320;
+      document.getElementById('serp-score').textContent = 'Puntuació: 0';
+      drawSerp();
+      updateSerp();
+    }
+
+    function setSnakeDirection(dir) {
+      if (dir === 'UP' && snakeGame.direction.y === 0) snakeGame.nextDirection = {x:0,y:-1};
+      if (dir === 'DOWN' && snakeGame.direction.y === 0) snakeGame.nextDirection = {x:0,y:1};
+      if (dir === 'LEFT' && snakeGame.direction.x === 0) snakeGame.nextDirection = {x:-1,y:0};
+      if (dir === 'RIGHT' && snakeGame.direction.x === 0) snakeGame.nextDirection = {x:1,y:0};
+    }
+
+    function updateSerp() {
+      if (!snakeGame.gameRunning) return;
+      snakeGame.direction = snakeGame.nextDirection;
+      const head = snakeGame.snake[0];
+      const newHead = {x: head.x + snakeGame.direction.x, y: head.y + snakeGame.direction.y};
+      if (newHead.x < 0 || newHead.x >= snakeGame.gridSize || newHead.y < 0 || newHead.y >= snakeGame.gridSize) {
+        stopSerp();
+        setTimeout(() => {
+          if (document.getElementById('page-game-serp').classList.contains('active')) {
+            kidsPopup('lose','🐍','Game Over!','Puntuació final: ' + snakeGame.score, initSerp);
+          }
+        }, 50);
+        return;
+      }
+      for (let segment of snakeGame.snake) {
+        if (newHead.x === segment.x && newHead.y === segment.y) {
+          stopSerp();
+          setTimeout(() => {
+            if (document.getElementById('page-game-serp').classList.contains('active')) {
+              kidsPopup('lose','🐍','Game Over!','Puntuació final: ' + snakeGame.score, initSerp);
+            }
+          }, 50);
+          return;
+        }
+      }
+      snakeGame.snake.unshift(newHead);
+      if (newHead.x === snakeGame.food.x && newHead.y === snakeGame.food.y) {
+        snakeGame.score++;
+        document.getElementById('serp-score').textContent = 'Puntuació: ' + snakeGame.score;
+        snakeGame.food = {
+          x: Math.floor(Math.random() * snakeGame.gridSize),
+          y: Math.floor(Math.random() * snakeGame.gridSize)
+        };
+      } else {
+        snakeGame.snake.pop();
+      }
+      drawSerp();
+      snakeGame.gameLoopId = setTimeout(updateSerp, snakeGame.gameSpeed);
+    }
+
+    function drawSerp() {
+      const canvas = document.getElementById('serp-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      const cellSize = canvas.width / snakeGame.gridSize;
+      ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+      ctx.lineWidth = 0.5;
+      for (let i = 1; i < snakeGame.gridSize; i++) {
+        ctx.beginPath(); ctx.moveTo(i * cellSize, 0); ctx.lineTo(i * cellSize, canvas.height); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, i * cellSize); ctx.lineTo(canvas.width, i * cellSize); ctx.stroke();
+      }
+      snakeGame.snake.forEach((segment, idx) => {
+        ctx.fillStyle = idx === 0 ? '#84cc16' : '#22c55e';
+        ctx.fillRect(segment.x * cellSize + 1, segment.y * cellSize + 1, cellSize - 2, cellSize - 2);
+      });
+      ctx.fillStyle = '#ff0000';
+      ctx.beginPath();
+      ctx.arc(snakeGame.food.x * cellSize + cellSize / 2, snakeGame.food.y * cellSize + cellSize / 2, cellSize / 2 - 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // TOPA MOLES GAME
+    let topaMolesState = {
+      running: false, score: 0, timeLeft: 30,
+      activeHole: -1, timerInterval: null, moleTimeout: null
+    };
+
+    function initTopaMoles() {
+      const grid = document.getElementById('topamoles-grid');
+      grid.innerHTML = '';
+      for (let i = 0; i < 9; i++) {
+        const hole = document.createElement('div');
+        hole.className = 'relative w-full aspect-square rounded-2xl bg-white/10 border-2 border-white/10 flex items-center justify-center overflow-hidden cursor-pointer active:scale-90 transition';
+        hole.innerHTML = `<span class="mole-emoji text-4xl select-none opacity-0 transition-all duration-150" data-hole="${i}">🐹</span>`;
+        hole.onclick = () => hitMole(i);
+        grid.appendChild(hole);
+      }
+      document.getElementById('topamoles-score').textContent = '0';
+      document.getElementById('topamoles-time').textContent = '30';
+      document.getElementById('topamoles-startbtn').classList.remove('hidden');
+    }
+
+    function startTopaMoles() {
+      topaMolesState = { running: true, score: 0, timeLeft: 30, activeHole: -1, timerInterval: null, moleTimeout: null };
+      document.getElementById('topamoles-score').textContent = '0';
+      document.getElementById('topamoles-time').textContent = '30';
+      document.getElementById('topamoles-startbtn').classList.add('hidden');
+      topaMolesState.timerInterval = setInterval(() => {
+        topaMolesState.timeLeft--;
+        document.getElementById('topamoles-time').textContent = topaMolesState.timeLeft;
+        if (topaMolesState.timeLeft <= 0) {
+          stopTopaMoles();
+          setTimeout(() => kidsPopup('win','🐹','Fi del joc!','Puntuació final: ' + topaMolesState.score + ' punts!', initTopaMoles), 100);
+        }
+      }, 1000);
+      showMole();
+    }
+
+    function showMole() {
+      if (!topaMolesState.running) return;
+      hideMole();
+      const hole = Math.floor(Math.random() * 9);
+      topaMolesState.activeHole = hole;
+      const moles = document.querySelectorAll('.mole-emoji');
+      if (moles[hole]) moles[hole].style.opacity = '1';
+      const delay = Math.max(600, 1200 - (30 - topaMolesState.timeLeft) * 20);
+      topaMolesState.moleTimeout = setTimeout(showMole, delay);
+    }
+
+    function hideMole() {
+      document.querySelectorAll('.mole-emoji').forEach(m => m.style.opacity = '0');
+      topaMolesState.activeHole = -1;
+    }
+
+    function hitMole(hole) {
+      if (!topaMolesState.running) return;
+      if (topaMolesState.activeHole !== hole) return;
+      topaMolesState.score++;
+      document.getElementById('topamoles-score').textContent = topaMolesState.score;
+      const moles = document.querySelectorAll('.mole-emoji');
+      if (moles[hole]) { moles[hole].textContent = '💥'; setTimeout(() => { if (moles[hole]) moles[hole].textContent = '🐹'; }, 200); }
+      hideMole();
+      if (topaMolesState.moleTimeout) clearTimeout(topaMolesState.moleTimeout);
+      topaMolesState.moleTimeout = setTimeout(showMole, 300);
+    }
+
+    function stopTopaMoles() {
+      topaMolesState.running = false;
+      if (topaMolesState.timerInterval) { clearInterval(topaMolesState.timerInterval); topaMolesState.timerInterval = null; }
+      if (topaMolesState.moleTimeout) { clearTimeout(topaMolesState.moleTimeout); topaMolesState.moleTimeout = null; }
+      hideMole();
+    }
+
+    // PONG GAME
+    let pongState = null;
+    let pongRaf = null;
+    let pongMulti = false;
+
+    function initPongMenu() {
+      document.getElementById('pong-menu').classList.remove('hidden');
+      document.getElementById('pong-game').classList.add('hidden');
+    }
+
+    function stopPong() {
+      if (pongRaf) { cancelAnimationFrame(pongRaf); pongRaf = null; }
+      if (pongState) pongState.running = false;
+    }
+
+    function pongP1(dir) { if (pongState) pongState.p1dir = dir; }
+    function pongP2(dir) { if (pongState) pongState.p2dir = dir; }
+
+    function startPong(multi) {
+      pongMulti = multi;
+      stopPong();
+      document.getElementById('pong-menu').classList.add('hidden');
+      document.getElementById('pong-game').classList.remove('hidden');
+
+      const p2ctrl = document.getElementById('pong-ctrl-p2');
+      const hintR = document.getElementById('pong-hint-right');
+      const labelR = document.getElementById('pong-label-right');
+      if (multi) {
+        p2ctrl.style.display = 'flex';
+        hintR.textContent = '◀▶ Botons J2';
+        labelR.textContent = 'Jugador 2';
+      } else {
+        p2ctrl.style.display = 'none';
+        hintR.textContent = 'CPU automàtic';
+        labelR.textContent = 'CPU';
+      }
+
+      const canvas = document.getElementById('pong-canvas');
+      const W = Math.min(340, window.innerWidth - 32);
+      const H = Math.round(W * 0.6);
+      canvas.width = W; canvas.height = H;
+
+      const PW = Math.round(W * 0.04), PH = Math.round(H * 0.22);
+      const BR = Math.round(W * 0.022);
+      const SPEED = W * 0.007;
+
+      pongState = {
+        running: true,
+        W, H, PW, PH, BR,
+        p1x: Math.round(W * 0.025), p1y: H/2 - PH/2,
+        p2x: W - Math.round(W * 0.025) - PW, p2y: H/2 - PH/2,
+        bx: W/2, by: H/2,
+        bvx: SPEED * (Math.random() > 0.5 ? 1 : -1),
+        bvy: SPEED * (Math.random() * 0.6 + 0.4) * (Math.random() > 0.5 ? 1 : -1),
+        score1: 0, score2: 0,
+        p1dir: 0, p2dir: 0,
+        paddleSpeed: H * 0.018,
+        maxSpeed: W * 0.018,
+      };
+      pongLoop();
+    }
+
+    function pongLoop() {
+      if (!pongState || !pongState.running) return;
+      const s = pongState;
+      const canvas = document.getElementById('pong-canvas');
+      if (!canvas) return;
+
+      // Move paddles
+      s.p1y = Math.max(0, Math.min(s.H - s.PH, s.p1y + s.p1dir * s.paddleSpeed));
+      if (pongMulti) {
+        s.p2y = Math.max(0, Math.min(s.H - s.PH, s.p2y + s.p2dir * s.paddleSpeed));
+      } else {
+        // CPU: track ball with slight delay
+        const target = s.by - s.PH / 2;
+        const diff = target - s.p2y;
+        s.p2y += Math.sign(diff) * Math.min(Math.abs(diff), s.paddleSpeed * 0.85);
+        s.p2y = Math.max(0, Math.min(s.H - s.PH, s.p2y));
+      }
+
+      // Move ball
+      s.bx += s.bvx;
+      s.by += s.bvy;
+
+      // Top/bottom bounce
+      if (s.by - s.BR <= 0) { s.by = s.BR; s.bvy = Math.abs(s.bvy); }
+      if (s.by + s.BR >= s.H) { s.by = s.H - s.BR; s.bvy = -Math.abs(s.bvy); }
+
+      // Paddle 1 (left) collision
+      if (s.bx - s.BR <= s.p1x + s.PW && s.bx - s.BR > s.p1x && s.by >= s.p1y && s.by <= s.p1y + s.PH) {
+        s.bx = s.p1x + s.PW + s.BR;
+        const hitPos = (s.by - s.p1y) / s.PH - 0.5; // -0.5 to 0.5
+        s.bvy = hitPos * s.maxSpeed * 2;
+        s.bvx = Math.min(s.maxSpeed, Math.abs(s.bvx) * 1.05);
+      }
+      // Paddle 2 (right) collision
+      if (s.bx + s.BR >= s.p2x && s.bx + s.BR < s.p2x + s.PW && s.by >= s.p2y && s.by <= s.p2y + s.PH) {
+        s.bx = s.p2x - s.BR;
+        const hitPos = (s.by - s.p2y) / s.PH - 0.5;
+        s.bvy = hitPos * s.maxSpeed * 2;
+        s.bvx = -Math.min(s.maxSpeed, Math.abs(s.bvx) * 1.05);
+      }
+
+      // Score
+      if (s.bx - s.BR < 0) {
+        s.score2++;
+        document.getElementById('pong-score-right').textContent = s.score2;
+        resetBall(s, 1);
+      }
+      if (s.bx + s.BR > s.W) {
+        s.score1++;
+        document.getElementById('pong-score-left').textContent = s.score1;
+        resetBall(s, -1);
+      }
+
+      // Win check
+      if (s.score1 >= 5 || s.score2 >= 5) {
+        stopPong();
+        const winner = s.score1 >= 5 ? 'Jugador 1' : (pongMulti ? 'Jugador 2' : 'CPU');
+        document.getElementById('pong-lastscore').textContent = `Última partida: ${s.score1} - ${s.score2}`;
+        setTimeout(() => {
+          if (document.getElementById('page-game-pong').classList.contains('active')) {
+            const isP1 = s.score1 >= 5;
+            kidsPopup('win','🏆', isP1 ? '🎉 Jugador 1 guanya!' : (pongMulti ? '🎉 Jugador 2 guanya!' : '🤖 CPU guanya!'), `Resultat: ${s.score1} - ${s.score2}`, initPongMenu);
+          }
+        }, 80);
+        return;
+      }
+
+      // Draw
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#050505';
+      ctx.fillRect(0, 0, s.W, s.H);
+      // Center line
+      ctx.setLineDash([6, 6]);
+      ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(s.W/2, 0); ctx.lineTo(s.W/2, s.H); ctx.stroke();
+      ctx.setLineDash([]);
+      // Paddles
+      ctx.fillStyle = '#22d3ee';
+      ctx.beginPath(); ctx.roundRect(s.p1x, s.p1y, s.PW, s.PH, 3); ctx.fill();
+      ctx.fillStyle = '#f472b6';
+      ctx.beginPath(); ctx.roundRect(s.p2x, s.p2y, s.PW, s.PH, 3); ctx.fill();
+      // Ball
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath(); ctx.arc(s.bx, s.by, s.BR, 0, Math.PI*2); ctx.fill();
+
+      pongRaf = requestAnimationFrame(pongLoop);
+    }
+
+    function resetBall(s, dirX) {
+      s.bx = s.W / 2; s.by = s.H / 2;
+      const spd = s.W * 0.007;
+      s.bvx = spd * dirX;
+      s.bvy = spd * (Math.random() * 0.6 + 0.3) * (Math.random() > 0.5 ? 1 : -1);
+    }
+
+    // RGL PLUS functions
+    function checkRglPass() {
+      const val = document.getElementById('rglplus-input').value;
+      const err = document.getElementById('rglplus-error');
+      if (val === RGL_PASS) {
+        rglUnlocked = true;
+        err.classList.add('hidden');
+        document.getElementById('rglplus-locked').classList.add('hidden');
+        document.getElementById('rglplus-unlocked').classList.remove('hidden');
+        lucide.createIcons();
+      } else {
+        err.classList.remove('hidden');
+        document.getElementById('rglplus-input').value = '';
+      }
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && document.getElementById('page-rglplus').classList.contains('active')) {
+        checkRglPass();
+      }
+    });
+
+    // SDK
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange: async (config) => {
+          const slogan = config.slogan || defaultConfig.slogan;
+          const el = document.getElementById('slogan-text');
+          if (el) el.textContent = slogan;
+          const font = config.font_family || defaultConfig.font_family;
+          document.body.style.fontFamily = `${font}, Outfit, sans-serif`;
+          const size = config.font_size || defaultConfig.font_size;
+          const title = document.getElementById('app-title');
+          if (title) title.style.fontSize = `${size * 2.2}px`;
+          if (el) el.style.fontSize = `${size}px`;
+          const pc = config.primary_color || defaultConfig.primary_color;
+          document.querySelectorAll('.bg-\\[\\#ff6b35\\]').forEach(e => e.style.backgroundColor = pc);
+          const sc = config.surface_color || defaultConfig.surface_color;
+          document.body.style.backgroundColor = sc;
+          const tc = config.text_color || defaultConfig.text_color;
+          document.body.style.color = tc;
+        },
+        mapToCapabilities: (config) => ({
+          recolorables: [
+            { get: () => config.surface_color || defaultConfig.surface_color, set: (v) => { config.surface_color = v; window.elementSdk.setConfig({ surface_color: v }); } },
+            { get: () => config.primary_color || defaultConfig.primary_color, set: (v) => { config.primary_color = v; window.elementSdk.setConfig({ primary_color: v }); } },
+            { get: () => config.text_color || defaultConfig.text_color, set: (v) => { config.text_color = v; window.elementSdk.setConfig({ text_color: v }); } },
+            { get: () => config.nav_bg_color || defaultConfig.nav_bg_color, set: (v) => { config.nav_bg_color = v; window.elementSdk.setConfig({ nav_bg_color: v }); } },
+          ],
+          borderables: [],
+          fontEditable: { get: () => config.font_family || defaultConfig.font_family, set: (v) => { config.font_family = v; window.elementSdk.setConfig({ font_family: v }); } },
+          fontSizeable: { get: () => config.font_size || defaultConfig.font_size, set: (v) => { config.font_size = v; window.elementSdk.setConfig({ font_size: v }); } }
+        }),
+        mapToEditPanelValues: (config) => new Map([['slogan', config.slogan || defaultConfig.slogan]])
+      });
+    }
+
+    lucide.createIcons();
+
+  </script>
+ <script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js');
+  });
+}
+</script>
+ </body>
+</html>
