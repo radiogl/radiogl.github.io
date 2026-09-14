@@ -2223,7 +2223,15 @@ if ('serviceWorker' in navigator) {
 }
 </script>
 <script>
+  function esSeccioKids() {
+    const active = document.querySelector('.page.active');
+    if (!active) return false;
+    const id = active.id || '';
+    return id.startsWith('page-kids') || id.startsWith('page-game-');
+  }
+
   function mostrarPopupAnunci() {
+    if (esSeccioKids()) return;
     if (document.getElementById('ad-popup-overlay')) return;
     const overlay = document.createElement('div');
     overlay.id = 'ad-popup-overlay';
@@ -2231,9 +2239,9 @@ if ('serviceWorker' in navigator) {
     overlay.innerHTML = `
       <div class="bg-[#141414] rounded-2xl w-full max-w-sm overflow-hidden relative border border-white/10 shadow-2xl">
         <div class="h-1 bg-white/10 w-full overflow-hidden">
-          <div id="ad-popup-progress" class="h-full bg-amber-500" style="width:0%;transition:width 5s linear;"></div>
+          <div id="ad-popup-progress" class="h-full bg-amber-500" style="width:0%;transition:width 10s linear;"></div>
         </div>
-        <button id="ad-popup-close" class="hidden absolute top-3 right-3 w-8 h-8 rounded-full bg-black/70 flex items-center justify-center text-white text-sm z-10 active:scale-95 transition" onclick="tancarPopupAnunci()">✕</button>
+        <button id="ad-popup-close" class="opacity-0 pointer-events-none absolute top-3 right-3 w-8 h-8 rounded-full bg-black/70 flex items-center justify-center text-white text-sm z-10 active:scale-95 transition" onclick="tancarPopupAnunci()">✕</button>
         <p class="text-center text-[10px] uppercase tracking-widest text-gray-500 pt-3">Publicitat</p>
         <div id="ad-popup-container" class="p-5 min-h-[180px] flex items-center justify-center"></div>
       </div>
@@ -2259,8 +2267,11 @@ if ('serviceWorker' in navigator) {
 
     setTimeout(() => {
       const closeBtn = document.getElementById('ad-popup-close');
-      if (closeBtn) closeBtn.classList.remove('hidden');
-    }, 5000);
+      if (closeBtn) {
+        closeBtn.classList.remove('opacity-0', 'pointer-events-none');
+        closeBtn.classList.add('opacity-100', 'pointer-events-auto');
+      }
+    }, 10000);
   }
 
   function tancarPopupAnunci() {
@@ -2268,11 +2279,22 @@ if ('serviceWorker' in navigator) {
     if (overlay) overlay.remove();
   }
 
-  window.addEventListener('load', () => {
+  function programarPopupPeriodic() {
+    const espera = 60000 + Math.random() * 60000; // entre 1 i 2 minuts
     setTimeout(() => {
-      if (Math.random() < 0.4) {
+      if (Math.random() < 0.6) {
         mostrarPopupAnunci();
       }
+      programarPopupPeriodic();
+    }, espera);
+  }
+
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      if (Math.random() < 0.55) {
+        mostrarPopupAnunci();
+      }
+      programarPopupPeriodic();
     }, 3000);
   });
 </script>
