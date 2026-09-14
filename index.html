@@ -2223,17 +2223,58 @@ if ('serviceWorker' in navigator) {
 }
 </script>
 <script>
-(function(izo){
-var d = document,
-    s = d.createElement('script'),
-    l = d.scripts[d.scripts.length - 1];
-s.settings = izo || {};
-s.src = "//quarrelsomebitter.com/b.XEVBskdmGklT0GYCWccE/ReCmY9yuJZLU/lckMPsThc/z-OdDDYx2DNrzhcOt_NtzHMF4yNnjMYa4TMlQ-";
-s.async = true;
-s.referrerPolicy = 'no-referrer-when-downgrade';
-l.parentNode.insertBefore(s, l);
-})({})
+  function mostrarPopupAnunci() {
+    if (document.getElementById('ad-popup-overlay')) return;
+    const overlay = document.createElement('div');
+    overlay.id = 'ad-popup-overlay';
+    overlay.className = 'fixed inset-0 bg-black/80 z-[999] flex items-center justify-center p-4';
+    overlay.innerHTML = `
+      <div class="bg-[#141414] rounded-2xl w-full max-w-sm overflow-hidden relative border border-white/10 shadow-2xl">
+        <div class="h-1 bg-white/10 w-full overflow-hidden">
+          <div id="ad-popup-progress" class="h-full bg-amber-500" style="width:0%;transition:width 5s linear;"></div>
+        </div>
+        <button id="ad-popup-close" class="hidden absolute top-3 right-3 w-8 h-8 rounded-full bg-black/70 flex items-center justify-center text-white text-sm z-10 active:scale-95 transition" onclick="tancarPopupAnunci()">✕</button>
+        <p class="text-center text-[10px] uppercase tracking-widest text-gray-500 pt-3">Publicitat</p>
+        <div id="ad-popup-container" class="p-5 min-h-[180px] flex items-center justify-center"></div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const bar = document.getElementById('ad-popup-progress');
+        if (bar) bar.style.width = '100%';
+      });
+    });
+
+    const adContainer = document.getElementById('ad-popup-container');
+    (function(vqdb){
+      var s = document.createElement('script');
+      s.settings = vqdb || {};
+      s.src = "//quarrelsomebitter.com/bcXnVys.dMGLlH0EYzWocb/Aesm_9/uTZ/U/lqk/PJT/cuz/OhDgYH5nMEj/kat/NczhM/4lNCjWk_z/M/wY";
+      s.async = true;
+      s.referrerPolicy = 'no-referrer-when-downgrade';
+      adContainer.appendChild(s);
+    })({});
+
+    setTimeout(() => {
+      const closeBtn = document.getElementById('ad-popup-close');
+      if (closeBtn) closeBtn.classList.remove('hidden');
+    }, 5000);
+  }
+
+  function tancarPopupAnunci() {
+    const overlay = document.getElementById('ad-popup-overlay');
+    if (overlay) overlay.remove();
+  }
+
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      if (Math.random() < 0.4) {
+        mostrarPopupAnunci();
+      }
+    }, 3000);
+  });
 </script>
-  <script type="text/javascript" src="//cdn-server.live/a73208828d07c5558c5c/12e41404a6/?placementName=default"></script>
  </body>
 </html>
