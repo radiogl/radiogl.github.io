@@ -1029,6 +1029,11 @@
             </div>
           </div>
 
+          <div class="bg-gradient-to-br from-amber-500/15 to-amber-600/5 rounded-xl p-5 border border-amber-500/20 text-center">
+            <h3 class="text-xs font-700 uppercase tracking-widest text-amber-500/80 mb-2">📊 Anuncis vistos aquest mes</h3>
+            <span id="contador-anuncis-hilltop" class="text-4xl font-900 text-amber-400 block">Carregant...</span>
+          </div>
+
           <div class="bg-white/5 rounded-xl p-4 border border-white/5">
             <h3 class="font-700 text-sm mb-2">🎯 El nostre objectiu del mes</h3>
             <div class="flex items-center gap-4 bg-amber-500/10 rounded-lg p-3 border border-amber-500/20">
@@ -2297,6 +2302,49 @@ if ('serviceWorker' in navigator) {
       programarPopupPeriodic();
     }, 3000);
   });
+
+  function obtenirAnuncisHilltop() {
+    const apiKey = "yddfeaQFocKOd9zvcfEjVm66ZHDGTHfZeurjVHHUQUEZx1qOA31WXcbh0SzRJQLy";
+
+    const ara = new Date();
+    const any = ara.getFullYear();
+    const mes = String(ara.getMonth() + 1).padStart(2, '0');
+    const dia = String(ara.getDate()).padStart(2, '0');
+
+    const dataInici = `${any}-${mes}-01`;
+    const dataFinal = `${any}-${mes}-${dia}`;
+
+    const urlAPI = `https://api.hilltopads.com/advertiser/listStats?key=${apiKey}&date=${dataInici}&date2=${dataFinal}`;
+
+    fetch(urlAPI)
+      .then(response => {
+        if (!response.ok) throw new Error("Error en la resposta de l'API");
+        return response.json();
+      })
+      .then(data => {
+        let totalImpressions = 0;
+        if (data && data.data && Array.isArray(data.data)) {
+          data.data.forEach(registre => {
+            if (registre.impressions) {
+              totalImpressions += parseInt(registre.impressions, 10);
+            }
+          });
+        }
+        const el = document.getElementById('contador-anuncis-hilltop');
+        if (el) el.innerText = totalImpressions.toLocaleString('ca-ES');
+      })
+      .catch(error => {
+        console.error("Error al carregar les dades de HilltopAds:", error);
+        const el = document.getElementById('contador-anuncis-hilltop');
+        if (el) el.innerText = "No disponible";
+      });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', obtenirAnuncisHilltop);
+  } else {
+    obtenirAnuncisHilltop();
+  }
 </script>
  </body>
 </html>
