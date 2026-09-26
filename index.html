@@ -346,13 +346,13 @@
               <div class="flex-1 text-left"><span class="font-900 text-lg text-white">JUGAR</span><p class="text-sm text-white/80 mt-0.5">Jocs interactius</p></div>
               <i data-lucide="arrow-right" class="w-5 h-5 text-white"></i>
             </button>
-            <button onclick="openKidsMirar()" class="flex items-center gap-4 bg-gradient-to-br from-purple-400 to-blue-400 rounded-3xl p-6 border-4 border-white/30 active:scale-95 transition transform">
-              <div class="w-16 h-16 rounded-2xl bg-white/40 flex items-center justify-center shrink-0 text-3xl">👀</div>
+            <button onclick="openKidsMirar()" class="flex items-center gap-4 bg-white/10 rounded-3xl p-6 border-4 border-white/10 active:scale-95 transition transform">
+              <div class="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center shrink-0 text-3xl grayscale opacity-60">👀</div>
               <div class="flex-1 text-left">
-                <span class="font-900 text-lg text-white">MIRAR</span>
-                <p class="text-sm text-white/80 mt-0.5">Sèries i dibuixos</p>
+                <span class="font-900 text-lg text-gray-400">MIRAR</span>
+                <p class="text-sm text-gray-500 mt-0.5">Secció no disponible, fes clic per llegir més</p>
               </div>
-              <i data-lucide="arrow-right" class="w-5 h-5 text-white"></i>
+              <i data-lucide="arrow-right" class="w-5 h-5 text-gray-500"></i>
             </button>
             <a href="https://drive.google.com/drive/folders/1L0gSBqxwxI9R_V6oJk5szEB1mj7wInp2?usp=drive_link" target="_blank" rel="noopener noreferrer" class="flex items-center gap-4 bg-gradient-to-br from-indigo-400 to-pink-400 rounded-3xl p-6 border-4 border-white/30 active:scale-95 transition transform">
               <div class="w-16 h-16 rounded-2xl bg-white/40 flex items-center justify-center shrink-0 text-3xl">🎵</div>
@@ -361,53 +361,6 @@
             </a>
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- KIDS MIRAR PAGE (Netflix-style) -->
-    <div class="page" id="page-kids-mirar">
-      <div class="flex-1 overflow-y-auto">
-        <div class="section-hero h-40 bg-gradient-to-br from-purple-400 via-blue-400 to-indigo-500 flex flex-col justify-end p-5">
-          <div class="section-hero-content">
-            <button onclick="backToKids()" class="mb-3 w-9 h-9 rounded-full bg-white/30 flex items-center justify-center backdrop-blur-sm"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
-            <h1 class="text-3xl font-900 text-white">👀 Mirar</h1>
-            <p class="text-sm text-white/90 mt-1">Sèries i pel·lícules per a nens</p>
-          </div>
-        </div>
-        <!-- Tabs -->
-        <div class="flex gap-2 px-5 pt-4">
-          <button id="mirar-tab-series" onclick="switchMirarTab('series')" class="flex-1 py-2.5 rounded-xl font-700 text-sm bg-white text-black transition">Sèries</button>
-          <button id="mirar-tab-movies" onclick="switchMirarTab('movies')" class="flex-1 py-2.5 rounded-xl font-700 text-sm bg-white/10 text-white transition">Pel·lícules</button>
-        </div>
-        <div class="py-5">
-          <div id="mirar-ultims-container" class="px-5"></div>
-          <div class="grid grid-cols-3 gap-3 px-5" id="mirar-row"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- KIDS SERIES EPISODES PAGE -->
-    <div class="page" id="page-kids-episodes">
-      <div class="flex-1 overflow-y-auto">
-        <div class="section-hero h-40 bg-gradient-to-br from-purple-400 via-blue-400 to-indigo-500 flex flex-col justify-end p-5">
-          <div class="section-hero-content">
-            <button onclick="openKidsMirar()" class="mb-3 w-9 h-9 rounded-full bg-white/30 flex items-center justify-center backdrop-blur-sm"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
-            <h1 class="text-2xl font-900 text-white" id="episodes-title"></h1>
-            <p class="text-sm text-white/90 mt-1">Tria un capítol</p>
-          </div>
-        </div>
-        <div class="p-5 space-y-3" id="episodes-list"></div>
-      </div>
-    </div>
-
-    <!-- KIDS VIDEO PLAYER PAGE -->
-    <div class="page" id="page-kids-player">
-      <div class="flex-1 flex flex-col p-4">
-        <button onclick="stopKidsPlayer()" class="mb-3 w-9 h-9 rounded-full bg-purple-500/30 flex items-center justify-center shrink-0"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
-        <div class="rounded-2xl overflow-hidden bg-black" style="aspect-ratio: 16/9;">
-          <iframe id="kids-player-iframe" width="100%" height="100%" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="display:block;"></iframe>
-        </div>
-        <h2 class="text-lg font-900 mt-4" id="kids-player-title"></h2>
       </div>
     </div>
 
@@ -1291,157 +1244,9 @@
       lucide.createIcons();
     }
 
-    // KIDS MIRAR (Netflix-style series + movies)
-    const kidsSeries = [
-      { title: "El Xai Shaun", cover: "Hzxkplv6sdM", episodes: ["Hzxkplv6sdM", "DKOJGBlo0W4", "4PspiCg8DdI"] },
-      { title: "Grizzly i els Lemmings", cover: "DoYNyKn1pNk", episodes: ["DoYNyKn1pNk", "dzDIt_RiqPc", "CPGRKGLwzQo"] },
-      { title: "Les Tres Bessones", cover: "aRedjK0yAME", episodes: ["aRedjK0yAME", "NoZ0A4oiguQ", "RliwAjIyP7o"] },
-      { title: "La Pantera Rosa", cover: "30MWO8kVOYc", episodes: ["30MWO8kVOYc", "Z0nk50iX2Bc", "QEkRmJfBWWc"] },
-      { title: "Robocar Poli", cover: "U6b6EZSR2Kc", episodes: ["U6b6EZSR2Kc", "38br0-1I7ho", "YbwPiVPBskI"] },
-      { title: "Una Mà de Contes", cover: "UuVP4hqcuUI", episodes: ["UuVP4hqcuUI", "EJO7fJpdCy8", "DyyQQa8TEak"] },
-      { title: "Tom i Jerry", cover: "nm5TZ6bvS94", episodes: ["nm5TZ6bvS94", "j-88jrkyszQ", "EJvXNPT4uD0"] },
-      { title: "Mic", cover: "d3PgntUmw8I", episodes: ["d3PgntUmw8I", "beduIZKqlGU", "wYMX5Q15QWA"] },
-      { title: "Els Barrufets", cover: "W-TeDol8wVU", episodes: ["W-TeDol8wVU", "uzD9MukVDOk", "3ScfXyNcJak"] },
-      { title: "PJ Masks", cover: "py9uGDARQgY", episodes: ["py9uGDARQgY", "ma1ydCMJjRQ", "HSW7LoO0fmE"] },
-      { title: "Doraemon", cover: "RBZTzGidfKU", episodes: ["RBZTzGidfKU", "Fw0WMcbPJPo", "fInVnrvEh5A"] },
-      { title: "Pepa la Porqueta", cover: "NXGT7pQ5GmU", episodes: ["NXGT7pQ5GmU", "C3pifNtvHEI", "rEVGdK0n4a4"] }
-    ];
-
-    const kidsUltimsEstrenes = [
-      { title: "La Patrulla Canina: La Dino Pel·lícula", embed: "https://ok.ru/videoembed/15833215470127?nochat=1" },
-      { title: "Toy Story 5", embed: "https://ok.ru/videoembed/15591798213167?nochat=1" },
-      { title: "Súper Mario Galaxy", embed: "https://ok.ru/videoembed/13756336376367?nochat=1" }
-    ];
-
-    const kidsMovies = [
-      { title: "Toy Story 3", embed: "https://ok.ru/videoembed/7683440118319?nochat=1" },
-      { title: "Shrek 3", embed: "https://ok.ru/videoembed/9835566533131?nochat=1" },
-      { title: "Gru, mi villano favorito", embed: "https://ok.ru/videoembed/7717345823279?nochat=1" },
-      { title: "Mascotas 2", embed: "https://ok.ru/videoembed/7349638203951?nochat=1" },
-      { title: "Los tipos malos", embed: "https://ok.ru/videoembed/7017628633644?nochat=1" },
-      { title: "Los tipos malos 2", embed: "https://ok.ru/videoembed/15094448851503?nochat=1" },
-      { title: "Del revés 2", embed: "https://ok.ru/videoembed/15132727904815?nochat=1" }
-    ];
-
-    let mirarActiveTab = 'series';
-    let kidsPlayerReturnTo = 'page-kids-mirar';
-
-    function switchMirarTab(tab) {
-      mirarActiveTab = tab;
-      const tabSeries = document.getElementById('mirar-tab-series');
-      const tabMovies = document.getElementById('mirar-tab-movies');
-      if (tab === 'series') {
-        tabSeries.className = 'flex-1 py-2.5 rounded-xl font-700 text-sm bg-white text-black transition';
-        tabMovies.className = 'flex-1 py-2.5 rounded-xl font-700 text-sm bg-white/10 text-white transition';
-      } else {
-        tabMovies.className = 'flex-1 py-2.5 rounded-xl font-700 text-sm bg-white text-black transition';
-        tabSeries.className = 'flex-1 py-2.5 rounded-xl font-700 text-sm bg-white/10 text-white transition';
-      }
-      renderMirarGrid();
-    }
-
-    function renderMirarGrid() {
-      const row = document.getElementById('mirar-row');
-      const ultimsContainer = document.getElementById('mirar-ultims-container');
-      if (mirarActiveTab === 'series') {
-        ultimsContainer.innerHTML = '';
-        row.innerHTML = kidsSeries.map((s, idx) => `
-          <button onclick="openSeriesEpisodes(${idx})" class="text-left active:scale-95 transition">
-            <div class="w-full aspect-video rounded-xl overflow-hidden bg-white/10 border border-white/10 relative">
-              <img src="https://img.youtube.com/vi/${s.cover}/hqdefault.jpg" class="w-full h-full object-cover" loading="lazy">
-              <div class="absolute inset-0 flex items-center justify-center bg-black/20">
-                <div class="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center"><i data-lucide="play" class="w-4 h-4 text-black ml-0.5"></i></div>
-              </div>
-            </div>
-            <p class="text-xs font-700 mt-1.5 leading-tight">${s.title}</p>
-          </button>
-        `).join('');
-      } else {
-        ultimsContainer.innerHTML = `
-          <div class="rounded-2xl p-4 mb-5 bg-gradient-to-br from-amber-500/15 to-amber-600/5 border border-amber-500/30">
-            <div class="flex items-center gap-2 mb-3">
-              <i data-lucide="flame" class="w-4 h-4 text-amber-400"></i>
-              <h3 class="text-xs font-900 uppercase tracking-widest text-amber-400">Últimes Estrenes</h3>
-            </div>
-            <div class="grid grid-cols-3 gap-3">
-              ${kidsUltimsEstrenes.map(m => `
-                <button onclick="playKidsMovie('${m.embed}', '${m.title.replace(/'/g, "\\'")}')" class="text-left active:scale-95 transition">
-                  <div class="w-full aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-amber-500 to-orange-600 border border-white/10 relative flex items-center justify-center">
-                    <span class="text-3xl">🎬</span>
-                    <div class="absolute inset-0 flex items-center justify-center bg-black/20">
-                      <div class="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center"><i data-lucide="play" class="w-4 h-4 text-black ml-0.5"></i></div>
-                    </div>
-                    <span class="absolute top-1 left-1 bg-amber-500 text-black text-[9px] font-900 px-1.5 py-0.5 rounded">NOU</span>
-                  </div>
-                  <p class="text-xs font-700 mt-1.5 leading-tight">${m.title}</p>
-                </button>
-              `).join('')}
-            </div>
-          </div>
-        `;
-        row.innerHTML = kidsMovies.map(m => `
-          <button onclick="playKidsMovie('${m.embed}', '${m.title.replace(/'/g, "\\'")}')" class="text-left active:scale-95 transition">
-            <div class="w-full aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-indigo-500 to-purple-600 border border-white/10 relative flex items-center justify-center">
-              <span class="text-3xl">🎬</span>
-              <div class="absolute inset-0 flex items-center justify-center bg-black/20">
-                <div class="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center"><i data-lucide="play" class="w-4 h-4 text-black ml-0.5"></i></div>
-              </div>
-            </div>
-            <p class="text-xs font-700 mt-1.5 leading-tight">${m.title}</p>
-          </button>
-        `).join('');
-      }
-      lucide.createIcons();
-    }
-
+    // KIDS MIRAR: secció eliminada per drets d'autor
     function openKidsMirar() {
-      renderMirarGrid();
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.getElementById('page-kids-mirar').classList.add('active');
-      lucide.createIcons();
-    }
-
-    function openSeriesEpisodes(idx) {
-      const s = kidsSeries[idx];
-      document.getElementById('episodes-title').textContent = s.title;
-      const list = document.getElementById('episodes-list');
-      list.innerHTML = s.episodes.map((epId, i) => `
-        <button onclick="playKidsVideo('${epId}', '${s.title.replace(/'/g, "\\'")} - Capítol ${i + 1}')" class="w-full flex items-center gap-4 bg-white/5 rounded-xl p-3 border border-white/5 active:scale-[0.98] transition">
-          <div class="w-24 h-14 rounded-lg overflow-hidden bg-white/10 shrink-0 relative">
-            <img src="https://img.youtube.com/vi/${epId}/hqdefault.jpg" class="w-full h-full object-cover" loading="lazy">
-          </div>
-          <div class="flex-1 text-left"><span class="font-700 text-sm">Capítol ${i + 1}</span></div>
-          <i data-lucide="play" class="w-4 h-4 text-gray-400 shrink-0"></i>
-        </button>
-      `).join('');
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.getElementById('page-kids-episodes').classList.add('active');
-      lucide.createIcons();
-    }
-
-    function playKidsVideo(id, title) {
-      kidsPlayerReturnTo = 'page-kids-episodes';
-      document.getElementById('kids-player-iframe').src = 'https://www.youtube.com/embed/' + id + '?autoplay=1&rel=0';
-      document.getElementById('kids-player-title').textContent = title;
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.getElementById('page-kids-player').classList.add('active');
-      lucide.createIcons();
-    }
-
-    function playKidsMovie(embedUrl, title) {
-      kidsPlayerReturnTo = 'page-kids-mirar';
-      document.getElementById('kids-player-iframe').src = embedUrl;
-      document.getElementById('kids-player-title').textContent = title;
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.getElementById('page-kids-player').classList.add('active');
-      lucide.createIcons();
-    }
-
-    function stopKidsPlayer() {
-      document.getElementById('kids-player-iframe').src = '';
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.getElementById(kidsPlayerReturnTo).classList.add('active');
-      lucide.createIcons();
+      alert("El nostre equip ha eliminat aquesta secció perquè infringia els drets d'autor.");
     }
 
     function backToKidsGames() {
