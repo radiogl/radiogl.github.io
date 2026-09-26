@@ -649,7 +649,7 @@
           </button>
           <button onclick="openMesSub('comunicacio')" class="w-full flex items-center gap-4 bg-white/5 rounded-xl p-4 border border-white/5 active:scale-[0.98] transition">
             <div class="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center shrink-0"><i data-lucide="messages-square" class="w-5 h-5 text-emerald-400"></i></div>
-            <div class="flex-1 text-left"><span class="font-700 text-sm">Comunicació</span><p class="text-xs text-gray-500 mt-0.5">Contacte i grup de novetats</p></div>
+            <div class="flex-1 text-left"><span class="font-700 text-sm">Comunicació</span><p class="text-xs text-gray-500 mt-0.5">Contacte i blog de novetats</p></div>
             <i data-lucide="chevron-right" class="w-4 h-4 text-gray-500 shrink-0"></i>
           </button>
           <button onclick="openMesSub('ajudans')" class="w-full flex items-center gap-4 bg-white/5 rounded-xl p-4 border border-white/5 active:scale-[0.98] transition">
@@ -854,7 +854,7 @@
               <span class="flex-1 font-700 text-sm">12. On puc seguir les novetats?</span>
               <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-gray-500 shrink-0 transition-transform"></i>
             </button>
-            <div class="faq-answer hidden px-4 pb-4"><p class="text-sm opacity-80 leading-relaxed">Uneix-te al nostre grup de WhatsApp, on només nosaltres podem escriure, i visita el nostre web per estar al dia de la programació, les novetats i els esdeveniments.</p></div>
+            <div class="faq-answer hidden px-4 pb-4"><p class="text-sm opacity-80 leading-relaxed">Visita el nostre <a href="https://novetatsradiogl.blogspot.com" target="_blank" rel="noopener noreferrer" class="text-emerald-400 font-700 underline">blog de novetats</a> i el nostre web per estar al dia de la programació, les novetats i els esdeveniments.</p></div>
           </div>
         </div>
       </div>
@@ -2223,15 +2223,15 @@ if ('serviceWorker' in navigator) {
 }
 </script>
 <script>
-  function esSeccioKids() {
+  function esSeccioSensePopup() {
     const active = document.querySelector('.page.active');
     if (!active) return false;
     const id = active.id || '';
-    return id.startsWith('page-kids') || id.startsWith('page-game-');
+    return id.startsWith('page-kids') || id.startsWith('page-game-') || id === 'page-mes-ajudans-nopagar';
   }
 
   function mostrarPopupAnunci() {
-    if (esSeccioKids()) return;
+    if (esSeccioSensePopup()) return;
     if (document.getElementById('ad-popup-overlay')) return;
     const overlay = document.createElement('div');
     overlay.id = 'ad-popup-overlay';
