@@ -380,6 +380,7 @@
           <button id="mirar-tab-movies" onclick="switchMirarTab('movies')" class="flex-1 py-2.5 rounded-xl font-700 text-sm bg-white/10 text-white transition">Pel·lícules</button>
         </div>
         <div class="py-5">
+          <div id="mirar-ultims-container" class="px-5"></div>
           <div class="grid grid-cols-3 gap-3 px-5" id="mirar-row"></div>
         </div>
       </div>
@@ -1306,10 +1307,20 @@
       { title: "Pepa la Porqueta", cover: "NXGT7pQ5GmU", episodes: ["NXGT7pQ5GmU", "C3pifNtvHEI", "rEVGdK0n4a4"] }
     ];
 
+    const kidsUltimsEstrenes = [
+      { title: "La Patrulla Canina: La Dino Pel·lícula", embed: "https://ok.ru/videoembed/15833215470127?nochat=1" },
+      { title: "Toy Story 5", embed: "https://ok.ru/videoembed/15591798213167?nochat=1" },
+      { title: "Súper Mario Galaxy", embed: "https://ok.ru/videoembed/13756336376367?nochat=1" }
+    ];
+
     const kidsMovies = [
       { title: "Toy Story 3", embed: "https://ok.ru/videoembed/7683440118319?nochat=1" },
       { title: "Shrek 3", embed: "https://ok.ru/videoembed/9835566533131?nochat=1" },
-      { title: "Gru, mi villano favorito", embed: "https://ok.ru/videoembed/7717345823279?nochat=1" }
+      { title: "Gru, mi villano favorito", embed: "https://ok.ru/videoembed/7717345823279?nochat=1" },
+      { title: "Mascotas 2", embed: "https://ok.ru/videoembed/7349638203951?nochat=1" },
+      { title: "Los tipos malos", embed: "https://ok.ru/videoembed/7017628633644?nochat=1" },
+      { title: "Los tipos malos 2", embed: "https://ok.ru/videoembed/15094448851503?nochat=1" },
+      { title: "Del revés 2", embed: "https://ok.ru/videoembed/15132727904815?nochat=1" }
     ];
 
     let mirarActiveTab = 'series';
@@ -1331,7 +1342,9 @@
 
     function renderMirarGrid() {
       const row = document.getElementById('mirar-row');
+      const ultimsContainer = document.getElementById('mirar-ultims-container');
       if (mirarActiveTab === 'series') {
+        ultimsContainer.innerHTML = '';
         row.innerHTML = kidsSeries.map((s, idx) => `
           <button onclick="openSeriesEpisodes(${idx})" class="text-left active:scale-95 transition">
             <div class="w-full aspect-video rounded-xl overflow-hidden bg-white/10 border border-white/10 relative">
@@ -1344,6 +1357,28 @@
           </button>
         `).join('');
       } else {
+        ultimsContainer.innerHTML = `
+          <div class="rounded-2xl p-4 mb-5 bg-gradient-to-br from-amber-500/15 to-amber-600/5 border border-amber-500/30">
+            <div class="flex items-center gap-2 mb-3">
+              <i data-lucide="flame" class="w-4 h-4 text-amber-400"></i>
+              <h3 class="text-xs font-900 uppercase tracking-widest text-amber-400">Últimes Estrenes</h3>
+            </div>
+            <div class="grid grid-cols-3 gap-3">
+              ${kidsUltimsEstrenes.map(m => `
+                <button onclick="playKidsMovie('${m.embed}', '${m.title.replace(/'/g, "\\'")}')" class="text-left active:scale-95 transition">
+                  <div class="w-full aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-amber-500 to-orange-600 border border-white/10 relative flex items-center justify-center">
+                    <span class="text-3xl">🎬</span>
+                    <div class="absolute inset-0 flex items-center justify-center bg-black/20">
+                      <div class="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center"><i data-lucide="play" class="w-4 h-4 text-black ml-0.5"></i></div>
+                    </div>
+                    <span class="absolute top-1 left-1 bg-amber-500 text-black text-[9px] font-900 px-1.5 py-0.5 rounded">NOU</span>
+                  </div>
+                  <p class="text-xs font-700 mt-1.5 leading-tight">${m.title}</p>
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        `;
         row.innerHTML = kidsMovies.map(m => `
           <button onclick="playKidsMovie('${m.embed}', '${m.title.replace(/'/g, "\\'")}')" class="text-left active:scale-95 transition">
             <div class="w-full aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-indigo-500 to-purple-600 border border-white/10 relative flex items-center justify-center">
