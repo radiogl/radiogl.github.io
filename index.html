@@ -6,6 +6,7 @@
   <title>Ràdio GL</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/_sdk/element_sdk.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
@@ -184,6 +185,7 @@
     <div class="page" id="page-musica">
       <div class="flex-1 overflow-y-auto">
         <div class="section-hero h-48 bg-gradient-to-br from-[#ff6b35] to-[#e8451c] flex flex-col justify-end p-5">
+          <button onclick="toggleFavorit('musica')" data-fav-btn="musica" class="fav-btn absolute top-5 right-5 z-10 w-9 h-9 rounded-full bg-black/30 flex items-center justify-center backdrop-blur-sm active:scale-90 transition"><i data-lucide="heart" class="w-4 h-4 text-white"></i></button>
           <div class="section-hero-content">
             <button onclick="goHome()" class="mb-3 w-9 h-9 rounded-full bg-black/30 flex items-center justify-center backdrop-blur-sm"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
             <h1 class="text-3xl font-900 text-white">🎵 Música</h1>
@@ -209,6 +211,7 @@
     <div class="page" id="page-entrevistes">
       <div class="flex-1 overflow-y-auto">
         <div class="section-hero h-48 bg-gradient-to-br from-emerald-600 to-emerald-800 flex flex-col justify-end p-5">
+          <button onclick="toggleFavorit('entrevistes')" data-fav-btn="entrevistes" class="fav-btn absolute top-5 right-5 z-10 w-9 h-9 rounded-full bg-black/30 flex items-center justify-center backdrop-blur-sm active:scale-90 transition"><i data-lucide="heart" class="w-4 h-4 text-white"></i></button>
           <div class="section-hero-content">
             <button onclick="goHome()" class="mb-3 w-9 h-9 rounded-full bg-black/30 flex items-center justify-center backdrop-blur-sm"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
             <h1 class="text-3xl font-900 text-white">🎙️ Entrevistes</h1>
@@ -234,6 +237,7 @@
     <div class="page" id="page-resenyes">
       <div class="flex-1 overflow-y-auto">
         <div class="section-hero h-48 bg-gradient-to-br from-purple-600 to-purple-900 flex flex-col justify-end p-5">
+          <button onclick="toggleFavorit('resenyes')" data-fav-btn="resenyes" class="fav-btn absolute top-5 right-5 z-10 w-9 h-9 rounded-full bg-black/30 flex items-center justify-center backdrop-blur-sm active:scale-90 transition"><i data-lucide="heart" class="w-4 h-4 text-white"></i></button>
           <div class="section-hero-content">
             <button onclick="goHome()" class="mb-3 w-9 h-9 rounded-full bg-black/30 flex items-center justify-center backdrop-blur-sm"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
             <h1 class="text-3xl font-900 text-white">📖 Resenyes</h1>
@@ -254,6 +258,7 @@
     <div class="page" id="page-especials">
       <div class="flex-1 overflow-y-auto">
         <div class="section-hero h-48 bg-gradient-to-br from-amber-600 to-amber-900 flex flex-col justify-end p-5">
+          <button onclick="toggleFavorit('especials')" data-fav-btn="especials" class="fav-btn absolute top-5 right-5 z-10 w-9 h-9 rounded-full bg-black/30 flex items-center justify-center backdrop-blur-sm active:scale-90 transition"><i data-lucide="heart" class="w-4 h-4 text-white"></i></button>
           <div class="section-hero-content">
             <button onclick="goHome()" class="mb-3 w-9 h-9 rounded-full bg-black/30 flex items-center justify-center backdrop-blur-sm"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
             <h1 class="text-3xl font-900 text-white">⭐ Reportatges</h1>
@@ -274,6 +279,7 @@
     <div class="page" id="page-acudits">
       <div class="flex-1 overflow-y-auto">
         <div class="section-hero h-48 bg-gradient-to-br from-yellow-400 to-orange-500 flex flex-col justify-end p-5">
+          <button onclick="toggleFavorit('acudits')" data-fav-btn="acudits" class="fav-btn absolute top-5 right-5 z-10 w-9 h-9 rounded-full bg-black/30 flex items-center justify-center backdrop-blur-sm active:scale-90 transition"><i data-lucide="heart" class="w-4 h-4 text-white"></i></button>
           <div class="section-hero-content">
             <button onclick="goHome()" class="mb-3 w-9 h-9 rounded-full bg-black/30 flex items-center justify-center backdrop-blur-sm"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
             <h1 class="text-3xl font-900 text-white">😂 Acudits</h1>
@@ -294,6 +300,7 @@
     <div class="page" id="page-rglplus">
       <div class="flex-1 overflow-y-auto">
         <div class="section-hero h-48 bg-gradient-to-br from-violet-700 to-violet-950 flex flex-col justify-end p-5">
+          <button onclick="toggleFavorit('rglplus')" data-fav-btn="rglplus" class="fav-btn absolute top-5 right-5 z-10 w-9 h-9 rounded-full bg-black/30 flex items-center justify-center backdrop-blur-sm active:scale-90 transition"><i data-lucide="heart" class="w-4 h-4 text-white"></i></button>
           <div class="section-hero-content">
             <button onclick="goHome()" class="mb-3 w-9 h-9 rounded-full bg-black/30 flex items-center justify-center backdrop-blur-sm"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
             <h1 class="text-3xl font-900 text-white">👑 RGL PLUS</h1>
@@ -333,6 +340,7 @@
     <div class="page" id="page-kids">
       <div class="flex-1 overflow-y-auto">
         <div class="section-hero h-48 bg-gradient-to-br from-pink-400 via-purple-400 to-indigo-500 flex flex-col justify-end p-5">
+          <button onclick="toggleFavorit('kids')" data-fav-btn="kids" class="fav-btn absolute top-5 right-5 z-10 w-9 h-9 rounded-full bg-white/30 flex items-center justify-center backdrop-blur-sm active:scale-90 transition"><i data-lucide="heart" class="w-4 h-4 text-white"></i></button>
           <div class="section-hero-content">
             <button onclick="goHome()" class="mb-3 w-9 h-9 rounded-full bg-white/30 flex items-center justify-center backdrop-blur-sm"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
             <h1 class="text-4xl font-900 text-white">🎉 KIDS</h1>
@@ -611,6 +619,11 @@
             <div class="flex-1 text-left"><span class="font-700 text-sm">Ajuda'ns</span><p class="text-xs text-gray-500 mt-0.5">Dona suport a la Ràdio GL</p></div>
             <i data-lucide="chevron-right" class="w-4 h-4 text-gray-500 shrink-0"></i>
           </button>
+          <button onclick="openMesSub('compte')" class="w-full flex items-center gap-4 bg-white/5 rounded-xl p-4 border border-white/5 active:scale-[0.98] transition">
+            <div class="w-12 h-12 rounded-xl bg-rose-500/20 flex items-center justify-center shrink-0"><i data-lucide="user-plus" class="w-5 h-5 text-rose-400"></i></div>
+            <div class="flex-1 text-left"><span class="font-700 text-sm" id="mes-compte-label">El teu compte</span><p class="text-xs text-gray-500 mt-0.5" id="mes-compte-sublabel">Registra't o inicia sessió</p></div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-gray-500 shrink-0"></i>
+          </button>
           <a href="https://sites.google.com/view/radio-gl" target="_blank" rel="noopener noreferrer" class="w-full flex items-center gap-4 bg-white/5 rounded-xl p-4 border border-white/5 active:scale-[0.98] transition">
             <div class="w-12 h-12 rounded-xl bg-violet-500/20 flex items-center justify-center shrink-0"><i data-lucide="globe" class="w-5 h-5 text-violet-400"></i></div>
             <div class="flex-1 text-left"><span class="font-700 text-sm">Pàgina web de la Ràdio</span><p class="text-xs text-gray-500 mt-0.5">sites.google.com/view/radio-gl</p></div>
@@ -620,7 +633,80 @@
       </div>
     </div>
 
-    <!-- MES > SUPORT SUBPAGE -->
+    <!-- MES > COMPTE SUBPAGE -->
+    <div class="page" id="page-mes-compte">
+      <div class="flex-1 overflow-y-auto">
+        <div class="section-hero h-48 bg-gradient-to-br from-rose-600 to-rose-900 flex flex-col justify-end p-5">
+          <div class="section-hero-content">
+            <button onclick="backToMes()" class="mb-3 w-9 h-9 rounded-full bg-black/30 flex items-center justify-center backdrop-blur-sm"><i data-lucide="arrow-left" class="w-4 h-4 text-white"></i></button>
+            <h1 class="text-3xl font-900 text-white" id="compte-titol">👤 El teu compte</h1>
+            <p class="text-sm text-white/70 mt-1" id="compte-subtitol">Registra't o inicia sessió</p>
+          </div>
+        </div>
+
+        <!-- VISTA: SENSE SESSIÓ INICIADA -->
+        <div id="compte-loggedout" class="p-5 space-y-4">
+          <div class="flex gap-2">
+            <button id="compte-tab-login" onclick="switchCompteTab('login')" class="flex-1 py-2.5 rounded-xl font-700 text-sm bg-white text-black transition">Iniciar sessió</button>
+            <button id="compte-tab-register" onclick="switchCompteTab('register')" class="flex-1 py-2.5 rounded-xl font-700 text-sm bg-white/10 text-white transition">Registrar-se</button>
+          </div>
+
+          <!-- LOGIN FORM -->
+          <form id="loginForm" class="space-y-3">
+            <div class="bg-white/5 rounded-xl border border-white/10 flex items-center gap-3 px-4 py-3.5 focus-within:border-rose-500/50 transition">
+              <i data-lucide="mail" class="w-5 h-5 text-gray-500 shrink-0"></i>
+              <input type="email" id="login-email" placeholder="El teu correu electrònic" required class="flex-1 bg-transparent outline-none text-sm placeholder-gray-500">
+            </div>
+            <div class="bg-white/5 rounded-xl border border-white/10 flex items-center gap-3 px-4 py-3.5 focus-within:border-rose-500/50 transition">
+              <i data-lucide="lock" class="w-5 h-5 text-gray-500 shrink-0"></i>
+              <input type="password" id="login-password" placeholder="La teva contrasenya" required class="flex-1 bg-transparent outline-none text-sm placeholder-gray-500">
+            </div>
+            <button type="submit" id="loginBtn" class="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-rose-500 to-rose-700 rounded-xl p-4 font-900 text-sm text-white active:scale-[0.98] transition shadow-lg shadow-rose-900/30">
+              <i data-lucide="log-in" class="w-5 h-5"></i>
+              <span>Iniciar sessió</span>
+            </button>
+          </form>
+
+          <!-- REGISTER FORM -->
+          <form id="registroForm" class="space-y-3 hidden">
+            <div class="bg-white/5 rounded-xl p-3 border border-white/5">
+              <p class="text-xs opacity-70 leading-relaxed">Crea el teu compte amb el teu correu electrònic i una contrasenya.</p>
+            </div>
+            <div class="bg-white/5 rounded-xl border border-white/10 flex items-center gap-3 px-4 py-3.5 focus-within:border-rose-500/50 transition">
+              <i data-lucide="mail" class="w-5 h-5 text-gray-500 shrink-0"></i>
+              <input type="email" id="email" placeholder="El teu correu electrònic" required class="flex-1 bg-transparent outline-none text-sm placeholder-gray-500">
+            </div>
+            <div class="bg-white/5 rounded-xl border border-white/10 flex items-center gap-3 px-4 py-3.5 focus-within:border-rose-500/50 transition">
+              <i data-lucide="lock" class="w-5 h-5 text-gray-500 shrink-0"></i>
+              <input type="password" id="password" placeholder="La teva contrasenya" required minlength="6" class="flex-1 bg-transparent outline-none text-sm placeholder-gray-500">
+            </div>
+            <button type="submit" id="registroBtn" class="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-rose-500 to-rose-700 rounded-xl p-4 font-900 text-sm text-white active:scale-[0.98] transition shadow-lg shadow-rose-900/30">
+              <i data-lucide="user-plus" class="w-5 h-5"></i>
+              <span>Registrar-me</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- VISTA: SESSIÓ INICIADA -->
+        <div id="compte-loggedin" class="p-5 space-y-4 hidden">
+          <div class="bg-white/5 rounded-xl p-4 border border-white/5 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-full bg-rose-500/20 flex items-center justify-center shrink-0"><i data-lucide="user-check" class="w-5 h-5 text-rose-400"></i></div>
+            <div class="flex-1 min-w-0"><span class="font-700 text-sm block truncate" id="compte-email-actual"></span><p class="text-xs text-gray-500 mt-0.5">Sessió iniciada</p></div>
+          </div>
+
+          <div>
+            <h3 class="text-xs font-700 uppercase tracking-widest text-gray-500 mb-3">💛 Els teus favorits</h3>
+            <div id="compte-favorits-list" class="space-y-2"></div>
+            <p id="compte-favorits-buit" class="text-sm opacity-60 text-center py-4 hidden">Encara no tens cap secció a favorits. Prem el cor ♡ dins d'un programa per afegir-lo!</p>
+          </div>
+
+          <button onclick="tancarSessio()" class="w-full flex items-center justify-center gap-3 bg-white/5 border border-white/10 rounded-xl p-4 font-700 text-sm text-gray-300 active:scale-[0.98] transition mt-2">
+            <i data-lucide="log-out" class="w-5 h-5"></i>
+            <span>Tancar sessió</span>
+          </button>
+        </div>
+      </div>
+    </div>
     <div class="page" id="page-mes-suport">
       <div class="flex-1 overflow-y-auto">
         <div class="section-hero h-48 bg-gradient-to-br from-sky-600 to-sky-900 flex flex-col justify-end p-5">
@@ -1097,6 +1183,10 @@
           <i data-lucide="crown" class="w-5 h-5"></i><span class="text-[8px] font-600">Plus</span>
           <div class="nav-dot w-1 h-1 rounded-full bg-violet-400"></div>
         </button>
+        <button onclick="openCompteNav()" class="bottom-nav-item text-gray-600 flex flex-col items-center gap-0.5 py-1 px-1" id="nav-compte">
+          <i data-lucide="user-circle" class="w-5 h-5"></i><span class="text-[8px] font-600">Compte</span>
+          <div class="nav-dot w-1 h-1 rounded-full bg-[#ff6b35]"></div>
+        </button>
         <button onclick="openSection('mes')" class="bottom-nav-item text-gray-600 flex flex-col items-center gap-0.5 py-1 px-1" id="nav-mes">
           <i data-lucide="more-horizontal" class="w-5 h-5"></i><span class="text-[8px] font-600">Més</span>
           <div class="nav-dot w-1 h-1 rounded-full bg-[#ff6b35]"></div>
@@ -1209,6 +1299,19 @@
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.getElementById('page-mes').classList.add('active');
       lucide.createIcons();
+    }
+
+    function openCompteNav() {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-mes-compte').classList.add('active');
+      document.querySelectorAll('.bottom-nav-item').forEach(b => {
+        b.classList.remove('active-nav');
+        b.classList.add('text-gray-600');
+      });
+      const navBtn = document.getElementById('nav-compte');
+      if (navBtn) { navBtn.classList.add('active-nav'); navBtn.classList.remove('text-gray-600'); }
+      lucide.createIcons();
+      if (typeof actualitzarVistaCompte === 'function') actualitzarVistaCompte();
     }
 
     function veureAnunciAjudans(btn) {
@@ -2119,11 +2222,48 @@ if ('serviceWorker' in navigator) {
     if (overlay) overlay.remove();
   }
 
+  function mostrarPopupRegistre() {
+    if (esSeccioSensePopup()) return;
+    if (document.getElementById('ad-popup-overlay')) return;
+    if (typeof currentUser !== 'undefined' && currentUser) return;
+    const overlay = document.createElement('div');
+    overlay.id = 'ad-popup-overlay';
+    overlay.className = 'fixed inset-0 bg-black/80 z-[999] flex items-center justify-center p-4';
+    overlay.innerHTML = `
+      <div class="bg-gradient-to-br from-rose-600 to-rose-900 rounded-2xl w-full max-w-sm overflow-hidden relative border border-white/10 shadow-2xl p-6 text-center">
+        <button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/30 flex items-center justify-center text-white text-sm active:scale-95 transition" onclick="tancarPopupAnunci()">✕</button>
+        <div class="text-4xl mb-3">👤</div>
+        <h3 class="text-lg font-900 text-white mb-2">Crea el teu compte a la Ràdio GL</h3>
+        <ul class="text-sm text-white/90 text-left space-y-2 mb-5 mx-auto max-w-[230px]">
+          <li class="flex items-start gap-2"><span>💛</span><span>Desa els teus programes preferits a favorits</span></li>
+          <li class="flex items-start gap-2"><span>⚡</span><span>Accedeix-hi més ràpid cada vegada</span></li>
+          <li class="flex items-start gap-2"><span>📻</span><span>Forma part de la comunitat Ràdio GL</span></li>
+        </ul>
+        <button onclick="anarACompteDesPopup()" class="w-full bg-white text-rose-700 font-900 text-sm rounded-xl p-3.5 active:scale-95 transition">Crear compte gratis</button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+  }
+
+  function anarACompteDesPopup() {
+    tancarPopupAnunci();
+    openCompteNav();
+  }
+
+  function mostrarPopupAleatori() {
+    if (esSeccioSensePopup()) return;
+    if (typeof currentUser !== 'undefined' && !currentUser && Math.random() < 0.3) {
+      mostrarPopupRegistre();
+    } else {
+      mostrarPopupAnunci();
+    }
+  }
+
   function programarPopupPeriodic() {
     const espera = 60000 + Math.random() * 60000; // entre 1 i 2 minuts
     setTimeout(() => {
       if (Math.random() < 0.6) {
-        mostrarPopupAnunci();
+        mostrarPopupAleatori();
       }
       programarPopupPeriodic();
     }, espera);
@@ -2132,10 +2272,222 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     setTimeout(() => {
       if (Math.random() < 0.55) {
-        mostrarPopupAnunci();
+        mostrarPopupAleatori();
       }
       programarPopupPeriodic();
     }, 3000);
+  });
+
+  // ===== SUPABASE: COMPTE I FAVORITS =====
+  const SUPABASE_URL = "https://nphcepxlziekgfoozhmc.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_t-WqVOioufJ6SVwPh2O6GA_u1E1Wqw8";
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  let currentUser = null;
+  let userFavorits = new Set();
+
+  const seccionsInfo = {
+    musica: { nom: "Música", emoji: "🎵" },
+    entrevistes: { nom: "Entrevistes", emoji: "🎙️" },
+    resenyes: { nom: "Resenyes", emoji: "📖" },
+    acudits: { nom: "Acudits", emoji: "😂" },
+    especials: { nom: "Reportatges", emoji: "⭐" },
+    rglplus: { nom: "RGL PLUS", emoji: "👑" },
+    kids: { nom: "Kids", emoji: "🎉" }
+  };
+
+  // ---- Formulari de REGISTRE ----
+  const registroForm = document.getElementById('registroForm');
+  if (registroForm) {
+    registroForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const btn = document.getElementById('registroBtn');
+      const btnHtmlOriginal = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span>Registrant...</span>';
+
+      const { data, error } = await supabaseClient.auth.signUp({
+        email: email,
+        password: password,
+      });
+
+      btn.disabled = false;
+      btn.innerHTML = btnHtmlOriginal;
+      lucide.createIcons();
+
+      if (error) {
+        alert("Error en registrar-te: " + error.message);
+      } else {
+        alert("Compte creat amb èxit! 🎉");
+        registroForm.reset();
+      }
+    });
+  }
+
+  // ---- Formulari d'INICI DE SESSIÓ ----
+  const loginForm = document.getElementById('loginForm');
+  if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      const btn = document.getElementById('loginBtn');
+      const btnHtmlOriginal = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span>Entrant...</span>';
+
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
+
+      btn.disabled = false;
+      btn.innerHTML = btnHtmlOriginal;
+      lucide.createIcons();
+
+      if (error) {
+        alert("Error en iniciar sessió: " + error.message);
+      } else {
+        loginForm.reset();
+      }
+    });
+  }
+
+  // ---- Tabs Login / Registre ----
+  function switchCompteTab(tab) {
+    const tabLogin = document.getElementById('compte-tab-login');
+    const tabRegister = document.getElementById('compte-tab-register');
+    const fLogin = document.getElementById('loginForm');
+    const fRegister = document.getElementById('registroForm');
+    if (tab === 'login') {
+      tabLogin.className = 'flex-1 py-2.5 rounded-xl font-700 text-sm bg-white text-black transition';
+      tabRegister.className = 'flex-1 py-2.5 rounded-xl font-700 text-sm bg-white/10 text-white transition';
+      fLogin.classList.remove('hidden');
+      fRegister.classList.add('hidden');
+    } else {
+      tabRegister.className = 'flex-1 py-2.5 rounded-xl font-700 text-sm bg-white text-black transition';
+      tabLogin.className = 'flex-1 py-2.5 rounded-xl font-700 text-sm bg-white/10 text-white transition';
+      fRegister.classList.remove('hidden');
+      fLogin.classList.add('hidden');
+    }
+  }
+
+  // ---- Tancar sessió ----
+  async function tancarSessio() {
+    await supabaseClient.auth.signOut();
+  }
+
+  // ---- Actualitzar la vista de la pàgina de compte ----
+  function actualitzarVistaCompte() {
+    const loggedOut = document.getElementById('compte-loggedout');
+    const loggedIn = document.getElementById('compte-loggedin');
+    const titol = document.getElementById('compte-titol');
+    const subtitol = document.getElementById('compte-subtitol');
+    const menuLabel = document.getElementById('mes-compte-label');
+    const menuSublabel = document.getElementById('mes-compte-sublabel');
+    if (!loggedOut || !loggedIn) return;
+
+    if (currentUser) {
+      loggedOut.classList.add('hidden');
+      loggedIn.classList.remove('hidden');
+      titol.textContent = '👤 El teu compte';
+      subtitol.textContent = currentUser.email;
+      document.getElementById('compte-email-actual').textContent = currentUser.email;
+      if (menuLabel) menuLabel.textContent = 'El teu compte';
+      if (menuSublabel) menuSublabel.textContent = currentUser.email;
+      renderFavoritsList();
+    } else {
+      loggedOut.classList.remove('hidden');
+      loggedIn.classList.add('hidden');
+      titol.textContent = '👤 El teu compte';
+      subtitol.textContent = "Registra't o inicia sessió";
+      if (menuLabel) menuLabel.textContent = 'El teu compte';
+      if (menuSublabel) menuSublabel.textContent = "Registra't o inicia sessió";
+    }
+  }
+
+  // ---- Carregar favorits de l'usuari des de Supabase ----
+  async function carregarFavorits() {
+    if (!currentUser) { userFavorits = new Set(); actualitzarIconesFavorits(); return; }
+    const { data, error } = await supabaseClient
+      .from('favorits')
+      .select('seccio')
+      .eq('user_id', currentUser.id);
+    if (!error && data) {
+      userFavorits = new Set(data.map(r => r.seccio));
+    }
+    actualitzarIconesFavorits();
+    renderFavoritsList();
+  }
+
+  // ---- Pintar cors omplerts/buits a totes les seccions ----
+  function actualitzarIconesFavorits() {
+    document.querySelectorAll('.fav-btn').forEach(btn => {
+      const seccio = btn.getAttribute('data-fav-btn');
+      const icon = btn.querySelector('svg') || btn.querySelector('i');
+      if (!icon) return;
+      if (userFavorits.has(seccio)) {
+        icon.setAttribute('fill', 'currentColor');
+        btn.classList.add('text-rose-400');
+      } else {
+        icon.setAttribute('fill', 'none');
+        btn.classList.remove('text-rose-400');
+      }
+    });
+  }
+
+  // ---- Afegir/treure una secció de favorits ----
+  async function toggleFavorit(seccio) {
+    if (!currentUser) {
+      alert("Has de crear un compte o iniciar sessió per afegir favorits.");
+      openSection('mes');
+      openMesSub('compte');
+      return;
+    }
+    if (userFavorits.has(seccio)) {
+      await supabaseClient.from('favorits').delete().eq('user_id', currentUser.id).eq('seccio', seccio);
+      userFavorits.delete(seccio);
+    } else {
+      await supabaseClient.from('favorits').insert({ user_id: currentUser.id, seccio: seccio });
+      userFavorits.add(seccio);
+    }
+    actualitzarIconesFavorits();
+    renderFavoritsList();
+  }
+
+  // ---- Renderitzar la llista de favorits a la pàgina de compte ----
+  function renderFavoritsList() {
+    const list = document.getElementById('compte-favorits-list');
+    const buit = document.getElementById('compte-favorits-buit');
+    if (!list) return;
+    if (userFavorits.size === 0) {
+      list.innerHTML = '';
+      if (buit) buit.classList.remove('hidden');
+      return;
+    }
+    if (buit) buit.classList.add('hidden');
+    list.innerHTML = Array.from(userFavorits).map(s => {
+      const info = seccionsInfo[s] || { nom: s, emoji: '🎧' };
+      return `
+        <button onclick="openSection('${s}')" class="w-full flex items-center gap-4 bg-white/5 rounded-xl p-3 border border-white/5 active:scale-[0.98] transition">
+          <div class="w-10 h-10 rounded-lg bg-rose-500/15 flex items-center justify-center shrink-0 text-lg">${info.emoji}</div>
+          <div class="flex-1 text-left"><span class="font-700 text-sm">${info.nom}</span></div>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-gray-500 shrink-0"></i>
+        </button>
+      `;
+    }).join('');
+    lucide.createIcons();
+  }
+
+  // ---- Escoltar canvis d'estat de sessió ----
+  supabaseClient.auth.onAuthStateChange((event, session) => {
+    currentUser = session ? session.user : null;
+    actualitzarVistaCompte();
+    carregarFavorits();
   });
 </script>
  </body>
